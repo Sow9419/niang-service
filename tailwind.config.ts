@@ -86,6 +86,9 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      translate: {
+        '19': '4.75rem',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

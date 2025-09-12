@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowRight, Fuel, TrendingUp, Users } from "lucide-react";
@@ -7,57 +9,41 @@ export default function FuelHeroContent() {
   const [isFeatureDialogOpen, setIsFeatureDialogOpen] = useState(false);
 
   return (
-    <main className="absolute bottom-8 left-8 z-20 max-w-2xl">
+    <main className="absolute bottom-8 left-8 z-20 max-w-lg">
       <div className="text-left">
-        <div className="inline-flex items-center px-4 py-2 rounded-full glass-effect mb-6 relative">
-          <div className="absolute top-0 left-1 right-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent rounded-full" />
-          <span className="text-foreground/90 text-sm font-light relative z-10 flex items-center">
+        <div
+          className="inline-flex items-center px-3 py-1 rounded-full bg-white/5 backdrop-blur-sm mb-4 relative"
+          style={{
+            filter: "url(#glass-effect)",
+          }}
+        >
+          <div className="absolute top-0 left-1 right-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full" />
+          <span className="text-white/90 text-xs font-light relative z-10 flex items-center">
             <Fuel className="w-4 h-4 mr-2" />
-            ✨ Nouvelle interface de gestion avancée
+            ✨ Interface de gestion avancée
           </span>
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-          <span className="fuel-gradient bg-clip-text text-transparent">Gérez</span> vos
+        <h1 className="text-5xl md:text-6xl md:leading-16 tracking-tight font-light text-white mb-4">
+          <span className="font-medium italic instrument">Gérez</span> vos
           <br />
-          <span className="font-light">citernes & livraisons</span>
+          <span className="font-light tracking-tight text-white">citernes & livraisons</span>
         </h1>
 
         {/* Description */}
-        <p className="text-lg font-light text-muted-foreground mb-8 leading-relaxed max-w-xl">
+        <p className="text-xs font-light text-white/70 mb-4 leading-relaxed">
           Solution complète pour la gestion intelligente de vos citernes, livraisons d'essence et gasoil, 
           avec un CRM intégré pour optimiser vos opérations.
         </p>
 
-        {/* Stats */}
-        <div className="flex items-center gap-8 mb-8">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-primary">500+</div>
-            <div className="text-sm text-muted-foreground">Stations équipées</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-secondary">99.9%</div>
-            <div className="text-sm text-muted-foreground">Uptime</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-accent">24/7</div>
-            <div className="text-sm text-muted-foreground">Monitoring</div>
-          </div>
-        </div>
-
         {/* Buttons */}
-        <div className="flex items-center gap-6 flex-wrap">
-          <Button size="lg" className="fuel-glow smooth-transition group">
-            Démarrer gratuitement
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
-          
+        <div className="flex items-center gap-4 flex-wrap">
           <Dialog open={isFeatureDialogOpen} onOpenChange={setIsFeatureDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" variant="outline" className="glass-effect smooth-transition">
-                Voir les fonctionnalités
-              </Button>
+              <button className="px-8 py-3 rounded-full bg-transparent border border-white/30 text-white font-normal text-xs transition-all duration-200 hover:bg-white/10 hover:border-white/50 cursor-pointer">
+                Fonctionnalités
+              </button>
             </DialogTrigger>
             <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
@@ -103,6 +89,10 @@ export default function FuelHeroContent() {
               </div>
             </DialogContent>
           </Dialog>
+          
+          <button className="px-8 py-3 rounded-full bg-white text-black font-normal text-xs transition-all duration-200 hover:bg-white/90 cursor-pointer">
+            Démarrer
+          </button>
         </div>
       </div>
     </main>
