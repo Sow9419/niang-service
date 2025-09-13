@@ -12,7 +12,7 @@ interface Profile {
   company_name: string | null;
 }
 
-export default function Home() {
+export default function Dashboard() {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
