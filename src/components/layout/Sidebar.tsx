@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import type { Page } from '../../integrations/supabase/types';
 import { LayoutGrid, Package, Truck, ClipboardList } from 'lucide-react';
 import { SettingsDialog } from '../dialog/Setting';
 
@@ -8,11 +7,11 @@ interface SidebarProps {
   deliveryCount?: number;
 }
 
-const navItems: { icon: React.ElementType; label: string; page: Page, path: string }[] = [
-  { icon: LayoutGrid, label: 'Dashboard', page: 'dashboard', path: '/dashboard' },
-  { icon: Package, label: 'Commandes', page: 'orders', path: '/orders' },
-  { icon: Truck, label: 'Deliveries', page: 'deliveries', path: '/deliveries' },
-  { icon: ClipboardList, label: 'Gestion', page: 'gestion', path: '/gestion' },
+const navItems: { icon: React.ElementType; label: string; path: string }[] = [
+  { icon: LayoutGrid, label: 'Dashboard', path: '/dashboard' },
+  { icon: Package, label: 'Commandes', path: '/orders' },
+  { icon: Truck, label: 'Deliveries', path: '/deliveries' },
+  { icon: ClipboardList, label: 'Gestion', path: '/gestion' },
 ];
 
 const Logo = () => (
@@ -35,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ deliveryCount = 0 }) => {
           const IconComponent = item.icon;
           return (
             <Link
-              key={item.page}
+              key={item.path}
               to={item.path}
               className={`relative w-14 h-14 flex items-center justify-center rounded-xl transition-colors duration-200 ${
                 currentPage === item.path
@@ -45,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ deliveryCount = 0 }) => {
               aria-label={item.label}
             >
               <IconComponent className="w-6 h-6" />
-               {item.page === 'deliveries' && deliveryCount > 0 && (
+               {item.path === '/deliveries' && deliveryCount > 0 && (
                 <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {deliveryCount}
                 </span>

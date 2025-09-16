@@ -1,17 +1,16 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import type { Page } from '../../integrations/supabase/types';
 import { LayoutGrid, Package, Truck, ClipboardList } from 'lucide-react';
 
 interface MobileNavProps {
   deliveryCount?: number;
 }
 
-const navItems: { icon: React.ElementType; label: string; page: Page, path: string }[] = [
-    { icon: LayoutGrid, label: 'Dashboard', page: 'dashboard', path: '/dashboard' },
-    { icon: Package, label: 'Commandes', page: 'orders', path: '/orders' },
-    { icon: Truck, label: 'Livraisons', page: 'deliveries', path: '/deliveries' },
-    { icon: ClipboardList, label: 'Gestion', page: 'gestion', path: '/gestion' },
+const navItems: { icon: React.ElementType; label: string; path: string }[] = [
+    { icon: LayoutGrid, label: 'Dashboard', path: '/dashboard' },
+    { icon: Package, label: 'Commandes', path: '/orders' },
+    { icon: Truck, label: 'Livraisons', path: '/deliveries' },
+    { icon: ClipboardList, label: 'Gestion', path: '/gestion' },
   ];
 
 const MobileNav: React.FC<MobileNavProps> = ({ deliveryCount = 0 }) => {
@@ -24,7 +23,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ deliveryCount = 0 }) => {
         const IconComponent = item.icon;
         return (
             <Link
-              key={item.page}
+              key={item.path}
               to={item.path}
               className={`relative flex flex-col items-center justify-center gap-1 w-16 h-16 rounded-xl transition-all duration-300 ${
                 currentPage === item.path ? 'text-orange-500 -translate-y-2 bg-orange-50 shadow-md' : 'text-gray-400'
@@ -34,7 +33,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ deliveryCount = 0 }) => {
               <IconComponent className="w-6 h-6" />
               {currentPage === item.path && <span className="text-xs font-bold">{item.label}</span>}
 
-              {item.page === 'deliveries' && deliveryCount > 0 && (
+              {item.path === '/deliveries' && deliveryCount > 0 && (
                 <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {deliveryCount}
                 </span>

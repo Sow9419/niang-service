@@ -14,6 +14,226 @@ export type Database = {
   }
   public: {
     Tables: {
+      citernes: {
+        Row: {
+          assigned_driver_id: string | null
+          capacity_liters: number | null
+          created_at: string
+          id: string
+          registration: string
+          status: Database["public"]["Enums"]["statut_citerne"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_driver_id?: string | null
+          capacity_liters?: number | null
+          created_at?: string
+          id?: string
+          registration: string
+          status?: Database["public"]["Enums"]["statut_citerne"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_driver_id?: string | null
+          capacity_liters?: number | null
+          created_at?: string
+          id?: string
+          registration?: string
+          status?: Database["public"]["Enums"]["statut_citerne"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "citernes_assigned_driver_id_fkey"
+            columns: ["assigned_driver_id"]
+            isOneToOne: true
+            referencedRelation: "conducteurs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      commandes: {
+        Row: {
+          client_id: string
+          created_at: string
+          estimated_amount: number
+          id: number
+          order_date: string
+          order_number: string
+          product: Database["public"]["Enums"]["type_produit"]
+          quantity: number
+          status: Database["public"]["Enums"]["statut_commun"]
+          unit_price: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          estimated_amount: number
+          id?: number
+          order_date?: string
+          order_number: string
+          product: Database["public"]["Enums"]["type_produit"]
+          quantity: number
+          status?: Database["public"]["Enums"]["statut_commun"]
+          unit_price: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          estimated_amount?: number
+          id?: number
+          order_date?: string
+          order_number?: string
+          product?: Database["public"]["Enums"]["type_produit"]
+          quantity?: number
+          status?: Database["public"]["Enums"]["statut_commun"]
+          unit_price?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commandes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conducteurs: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          name: string
+          phone: string | null
+          status: Database["public"]["Enums"]["statut_conducteur"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["statut_conducteur"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["statut_conducteur"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      livraisons: {
+        Row: {
+          citerne_id: string
+          commande_id: number
+          created_at: string
+          date_livraison: string
+          id: number
+          payment_status: Database["public"]["Enums"]["statut_paiement"]
+          status: Database["public"]["Enums"]["statut_commun"]
+          updated_at: string
+          user_id: string | null
+          volume_livre: number
+          volume_manquant: number
+        }
+        Insert: {
+          citerne_id: string
+          commande_id: number
+          created_at?: string
+          date_livraison: string
+          id?: number
+          payment_status?: Database["public"]["Enums"]["statut_paiement"]
+          status?: Database["public"]["Enums"]["statut_commun"]
+          updated_at?: string
+          user_id?: string | null
+          volume_livre: number
+          volume_manquant: number
+        }
+        Update: {
+          citerne_id?: string
+          commande_id?: number
+          created_at?: string
+          date_livraison?: string
+          id?: number
+          payment_status?: Database["public"]["Enums"]["statut_paiement"]
+          status?: Database["public"]["Enums"]["statut_commun"]
+          updated_at?: string
+          user_id?: string | null
+          volume_livre?: number
+          volume_manquant?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "livraisons_citerne_id_fkey"
+            columns: ["citerne_id"]
+            isOneToOne: false
+            referencedRelation: "citernes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "livraisons_commande_id_fkey"
+            columns: ["commande_id"]
+            isOneToOne: true
+            referencedRelation: "commandes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_name: string | null
@@ -52,7 +272,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      statut_citerne: "Disponible" | "En livraison" | "En maintenance"
+      statut_commun: "Non Livré" | "Livré" | "Annulée"
+      statut_conducteur: "available" | "on_delivery" | "maintenance"
+      statut_paiement: "PAYÉ" | "NON PAYÉ"
+      type_produit: "Essence" | "Gasoil"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -179,7 +403,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      statut_citerne: ["Disponible", "En livraison", "En maintenance"],
+      statut_commun: ["Non Livré", "Livré", "Annulée"],
+      statut_conducteur: ["available", "on_delivery", "maintenance"],
+      statut_paiement: ["PAYÉ", "NON PAYÉ"],
+      type_produit: ["Essence", "Gasoil"],
+    },
   },
 } as const
-export type Page = 'dashboard' | 'orders' | 'deliveries' | 'gestion' | 'profile';
