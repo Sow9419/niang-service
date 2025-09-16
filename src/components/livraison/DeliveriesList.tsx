@@ -1,22 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Edit, Eye } from 'lucide-react';
-import type { Livraison, LivraisonStatus, LivraisonPaymentStatus } from '../../types';
-
-type EnrichedLivraison = Livraison & { commande_quantity: number };
-
-const mockLivraisons: EnrichedLivraison[] = [
-  { id: 1, commande_id: 3, commande_order_number: '#1254', client: 'Client B', citerne: 'Citerne 2', commande_quantity: 5500, volume_livre: 5450, volume_manquant: 50, date_livraison: '24/05/2024', status: 'Non Livré', payment_status: 'NON PAYÉ' },
-  { id: 2, commande_id: 4, commande_order_number: '#1253', client: 'Client A', citerne: 'Citerne 1', commande_quantity: 10000, volume_livre: 10000, volume_manquant: 0, date_livraison: '23/05/2024', status: 'Livré', payment_status: 'PAYÉ' },
-  { id: 3, commande_id: 7, commande_order_number: '#1252', client: 'Client C', citerne: 'Citerne 1', commande_quantity: 8000, volume_livre: 7800, volume_manquant: 200, date_livraison: '22/05/2024', status: 'Livré', payment_status: 'NON PAYÉ' },
-  { id: 4, commande_id: 5, commande_order_number: '#1251', client: 'Client F', citerne: 'Citerne 3', commande_quantity: 3000, volume_livre: 3000, volume_manquant: 0, date_livraison: '21/05/2024', status: 'Annulée', payment_status: 'PAYÉ' },
-  { id: 5, commande_id: 8, commande_order_number: '#1250', client: 'Client G', citerne: 'Citerne 4', commande_quantity: 12000, volume_livre: 12000, volume_manquant: 0, date_livraison: '20/05/2024', status: 'Livré', payment_status: 'PAYÉ' },
-];
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { Livraison, LivraisonStatus, LivraisonPaymentStatus, LivraisonUpdate } from '../../types';
 
 const ITEMS_PER_PAGE = 4;
 
 interface DeliveriesListProps {
+    livraisons: Livraison[];
     onEdit: (livraison: Livraison) => void;
     editingDeliveryId: number | null;
+    onUpdate: (livraisonData: LivraisonUpdate, commandeQuantity?: number) => void;
 }
 
 const deliveryStatusStyles: Record<LivraisonStatus, string> = {
@@ -42,7 +35,7 @@ const ActionButton: React.FC<{ status: LivraisonStatus; onClick: () => void; isE
 };
 
 const DeliveryCard: React.FC<{ 
-    livraison: EnrichedLivraison; 
+    livraison: Livraison;
     onEdit: (livraison: Livraison) => void; 
     isEditing: boolean;
     onDeliveryStatusChange: (id: number, status: LivraisonStatus) => void;
@@ -51,28 +44,28 @@ const DeliveryCard: React.FC<{
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
         <div className="flex justify-between items-start mb-3">
             <div>
-                <p className="font-semibold text-gray-900">Commande {livraison.commande_order_number}</p>
-                <p className="text-sm text-gray-600">{livraison.client}</p>
+                <p className="font-semibold text-gray-900">Commande {livraison.commandes.order_number}</p>
+                <p className="text-sm text-gray-600">{livraison.commandes.clients.name}</p>
             </div>
-             <select
-                value={livraison.status}
-                onChange={(e) => onDeliveryStatusChange(livraison.id, e.target.value as LivraisonStatus)}
-                className={`${baseSelectClasses} ${deliveryStatusStyles[livraison.status]}`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <option value="Non Livré">Non Livré</option>
-                <option value="Livré">Livré</option>
-                <option value="Annulée">Annulée</option>
-            </select>
+            <Select value={livraison.status} onValueChange={(value) => onDeliveryStatusChange(livraison.id, value as LivraisonStatus)}>
+                <SelectTrigger className={`${baseSelectClasses} ${deliveryStatusStyles[livraison.status]}`}>
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="Non Livré">Non Livré</SelectItem>
+                    <SelectItem value="Livré">Livré</SelectItem>
+                    <SelectItem value="Annulée">Annulée</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
         <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm text-left border-t border-b py-3 my-3">
             <div>
                 <p className="text-gray-500">Quantité Cmd.</p>
-                <p className="font-medium text-gray-800">{livraison.commande_quantity.toLocaleString('fr-FR')} L</p>
+                <p className="font-medium text-gray-800">{livraison.commandes.quantity.toLocaleString('fr-FR')} L</p>
             </div>
              <div>
                 <p className="text-gray-500">Citerne</p>
-                <p className="font-medium text-gray-800">{livraison.citerne}</p>
+                <p className="font-medium text-gray-800">{livraison.citernes.registration}</p>
             </div>
             <div>
                 <p className="text-gray-500">Volume Livré</p>
@@ -86,17 +79,17 @@ const DeliveryCard: React.FC<{
             </div>
         </div>
         <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500">Date: <span className="font-medium text-gray-700">{livraison.date_livraison}</span></span>
+            <span className="text-gray-500">Date: <span className="font-medium text-gray-700">{new Date(livraison.date_livraison).toLocaleDateString('fr-FR')}</span></span>
              <div className="flex items-center gap-4">
-                 <select
-                    value={livraison.payment_status}
-                    onChange={(e) => onPaymentStatusChange(livraison.id, e.target.value as LivraisonPaymentStatus)}
-                    className={`${baseSelectClasses} ${paymentStatusStyles[livraison.payment_status]}`}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <option value="NON PAYÉ">NON PAYÉ</option>
-                    <option value="PAYÉ">PAYÉ</option>
-                </select>
+                <Select value={livraison.payment_status} onValueChange={(value) => onPaymentStatusChange(livraison.id, value as LivraisonPaymentStatus)}>
+                    <SelectTrigger className={`${baseSelectClasses} ${paymentStatusStyles[livraison.payment_status]}`}>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="NON PAYÉ">NON PAYÉ</SelectItem>
+                        <SelectItem value="PAYÉ">PAYÉ</SelectItem>
+                    </SelectContent>
+                </Select>
                 <ActionButton status={livraison.status} onClick={() => onEdit(livraison)} isEditing={isEditing} />
             </div>
         </div>
@@ -104,27 +97,35 @@ const DeliveryCard: React.FC<{
 );
 
 
-const DeliveriesList: React.FC<DeliveriesListProps> = ({ onEdit, editingDeliveryId }) => {
-    const [livraisons, setLivraisons] = useState<EnrichedLivraison[]>(mockLivraisons);
+const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, editingDeliveryId, onUpdate }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<LivraisonStatus | 'Tous'>('Tous');
     const [currentPage, setCurrentPage] = useState(1);
 
+    if (livraisons.length === 0) {
+        return (
+            <div className="text-center py-12">
+                <h3 className="text-xl font-semibold">Aucune livraison à afficher</h3>
+                <p className="text-muted-foreground mt-2">Les livraisons associées à vos commandes apparaîtront ici.</p>
+            </div>
+        )
+    }
+
     const handleDeliveryStatusChange = (id: number, status: LivraisonStatus) => {
-        setLivraisons(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+        onUpdate({ id, status });
     };
 
     const handlePaymentStatusChange = (id: number, status: LivraisonPaymentStatus) => {
-        setLivraisons(prev => prev.map(l => l.id === id ? { ...l, payment_status: status } : l));
+        onUpdate({ id, payment_status: status });
     };
 
     const filteredLivraisons = useMemo(() => {
         return livraisons.filter(l => {
-            const searchMatch = l.client.toLowerCase().includes(searchTerm.toLowerCase()) || l.commande_order_number.toLowerCase().includes(searchTerm.toLowerCase());
+            const searchMatch = l.commandes.clients.name.toLowerCase().includes(searchTerm.toLowerCase()) || l.commandes.order_number.toLowerCase().includes(searchTerm.toLowerCase());
             const statusMatch = statusFilter === 'Tous' || l.status === statusFilter;
             return searchMatch && statusMatch;
         });
-    }, [searchTerm, statusFilter, livraisons]);
+    }, [livraisons, searchTerm, statusFilter]);
 
     const totalPages = Math.ceil(filteredLivraisons.length / ITEMS_PER_PAGE);
     const paginatedLivraisons = filteredLivraisons.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -204,35 +205,35 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ onEdit, editingDelivery
                             const isEditing = livraison.id === editingDeliveryId;
                             return (
                                 <tr key={livraison.id} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{livraison.commande_order_number}</td>
-                                    <td className="px-4 py-4">{livraison.client}</td>
-                                    <td className="px-4 py-4 font-medium text-gray-800">{livraison.commande_quantity.toLocaleString('fr-FR')} L</td>
+                                    <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{livraison.commandes.order_number}</td>
+                                    <td className="px-4 py-4">{livraison.commandes.clients.name}</td>
+                                    <td className="px-4 py-4 font-medium text-gray-800">{livraison.commandes.quantity.toLocaleString('fr-FR')} L</td>
                                     <td className="px-4 py-4">{livraison.volume_livre.toLocaleString('fr-FR')} L</td>
                                     <td className={`px-4 py-4 font-medium ${livraison.volume_manquant > 0 ? 'text-red-600' : ''}`}>{livraison.volume_manquant.toLocaleString('fr-FR')} L</td>
-                                    <td className="px-4 py-4">{livraison.citerne}</td>
-                                    <td className="px-4 py-4">{livraison.date_livraison}</td>
+                                    <td className="px-4 py-4">{livraison.citernes.registration}</td>
+                                    <td className="px-4 py-4">{new Date(livraison.date_livraison).toLocaleDateString('fr-FR')}</td>
                                     <td className="px-4 py-4">
-                                        <select
-                                            value={livraison.status}
-                                            onChange={(e) => handleDeliveryStatusChange(livraison.id, e.target.value as LivraisonStatus)}
-                                            className={`${baseSelectClasses} ${deliveryStatusStyles[livraison.status]}`}
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <option value="Non Livré">Non Livré</option>
-                                            <option value="Livré">Livré</option>
-                                            <option value="Annulée">Annulée</option>
-                                        </select>
+                                        <Select value={livraison.status} onValueChange={(value) => handleDeliveryStatusChange(livraison.id, value as LivraisonStatus)}>
+                                            <SelectTrigger className={`${baseSelectClasses} ${deliveryStatusStyles[livraison.status]}`}>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Non Livré">Non Livré</SelectItem>
+                                                <SelectItem value="Livré">Livré</SelectItem>
+                                                <SelectItem value="Annulée">Annulée</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </td>
                                      <td className="px-4 py-4">
-                                        <select
-                                            value={livraison.payment_status}
-                                            onChange={(e) => handlePaymentStatusChange(livraison.id, e.target.value as LivraisonPaymentStatus)}
-                                            className={`${baseSelectClasses} ${paymentStatusStyles[livraison.payment_status]}`}
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <option value="NON PAYÉ">NON PAYÉ</option>
-                                            <option value="PAYÉ">PAYÉ</option>
-                                        </select>
+                                        <Select value={livraison.payment_status} onValueChange={(value) => handlePaymentStatusChange(livraison.id, value as LivraisonPaymentStatus)}>
+                                            <SelectTrigger className={`${baseSelectClasses} ${paymentStatusStyles[livraison.payment_status]}`}>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="NON PAYÉ">NON PAYÉ</SelectItem>
+                                                <SelectItem value="PAYÉ">PAYÉ</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </td>
                                     <td className="px-4 py-4">
                                         <ActionButton status={livraison.status} onClick={() => onEdit(livraison)} isEditing={isEditing} />
