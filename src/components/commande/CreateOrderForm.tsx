@@ -1,81 +1,184 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import type { Client, Commande, CommandeInsert } from '@/types';
 
-const InputField = ({ label, id, ...props }) => (
-    <div className="flex-1 min-w-[200px]">
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        <input id={id} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500" {...props} />
-    </div>
-);
+const formSchema = z.object({
+  client_id: z.string().nonempty("Le client est requis"),
+  product_type: z.enum(['Essence', 'Gasoil']),
+  quantity: z.number().min(1, "La quantité doit être supérieure à 0"),
+  unit_price: z.number().min(1, "Le prix unitaire doit être supérieur à 0"),
+  status: z.enum(['Non Livré', 'Livré', 'Annulée']),
+});
 
-const SelectField = ({ label, id, children, ...props }) => (
-     <div className="flex-1 min-w-[200px]">
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        <select id={id} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white" {...props}>
-            {children}
-        </select>
-    </div>
-);
+interface CreateOrderFormProps {
+  onClose: () => void;
+  onSubmit: (data: CommandeInsert) => void;
+  clients: Client[];
+  commande?: Commande | null;
+}
 
-const CreateOrderForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const [quantity, setQuantity] = useState(5000);
-    const [unitPrice, setUnitPrice] = useState(850);
+const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, clients, commande }) => {
+  const isEditMode = !!commande;
 
-    const estimatedAmount = useMemo(() => {
-        return (quantity * unitPrice).toLocaleString('fr-FR');
-    }, [quantity, unitPrice]);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      client_id: '',
+      product_type: 'Gasoil',
+      quantity: 5000,
+      unit_price: 850,
+      status: 'Non Livré',
+    },
+  });
 
-    return (
-        <section className="bg-white p-6 rounded-2xl shadow-sm mb-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Créer une nouvelle commande</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                <InputField label="Numéro de commande" id="order-number" placeholder="Ex: CMD-2024-001" />
-                <SelectField label="Client associé" id="client">
-                    <option>Client A</option>
-                    <option>Client B</option>
-                    <option>Client C</option>
-                </SelectField>
-                <SelectField label="Type de produit" id="product-type">
-                    <option>Essence</option>
-                    <option>Gasoil</option>
-                </SelectField>
-                <InputField 
-                    label="Quantité commandée (L)" 
-                    id="quantity" 
-                    type="number" 
-                    placeholder="Ex: 5000" 
-                    value={quantity} 
-                    onChange={(e) => setQuantity(Number(e.target.value))} 
-                />
-                <InputField 
-                    label="Prix unitaire (FCFA/L)" 
-                    id="unit-price" 
-                    type="number" 
-                    placeholder="Ex: 850"
-                    value={unitPrice}
-                    onChange={(e) => setUnitPrice(Number(e.target.value))} 
-                />
-                <InputField label="Montant estimé (FCFA)" id="estimated-amount" value={estimatedAmount} disabled className="bg-gray-100" />
+  useEffect(() => {
+    if (commande) {
+      form.reset({
+        client_id: commande.client_id.toString(),
+        product_type: commande.product_type,
+        quantity: commande.quantity,
+        unit_price: commande.unit_price,
+        status: commande.status,
+      });
+    }
+  }, [commande, form]);
+
+  const { watch } = form;
+  const quantity = watch('quantity');
+  const unit_price = watch('unit_price');
+  const estimatedAmount = (quantity || 0) * (unit_price || 0);
+
+  const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
+    onSubmit({
+      ...values,
+      estimated_amount: estimatedAmount,
+    });
+  };
+
+  return (
+    <section className="bg-white p-6 rounded-2xl shadow-sm mb-8">
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">
+        {isEditMode ? 'Modifier la commande' : 'Créer une nouvelle commande'}
+      </h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FormField
+              control={form.control}
+              name="client_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client associé</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un client" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {clients.map((client) => (
+                        <SelectItem key={client.id} value={client.id.toString()}>
+                          {client.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="product_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type de produit</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un produit" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Essence">Essence</SelectItem>
+                      <SelectItem value="Gasoil">Gasoil</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantité commandée (L)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="unit_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Prix unitaire (FCFA/L)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <div>
+                <FormLabel>Montant estimé (FCFA)</FormLabel>
+                <Input value={estimatedAmount.toLocaleString('fr-FR')} disabled className="bg-gray-100 mt-2" />
             </div>
-             <div className="mb-6">
-                <SelectField label="Statut de la commande" id="status">
-                    <option>Non Livré</option>
-                    <option>Livré</option>
-                    <option>Annulée</option>
-                </SelectField>
-            </div>
-            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
-                <button 
-                    onClick={onClose}
-                    className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                    Annuler
-                </button>
-                <button className="w-full sm:w-auto px-6 py-2 bg-orange-500 text-white rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors shadow-sm">
-                    Enregistrer la commande
-                </button>
-            </div>
-        </section>
-    );
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Statut de la commande</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un statut" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Non Livré">Non Livré</SelectItem>
+                      <SelectItem value="Livré">Livré</SelectItem>
+                      <SelectItem value="Annulée">Annulée</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Annuler
+            </Button>
+            <Button type="submit">
+              {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer la commande'}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </section>
+  );
 };
 
 export default CreateOrderForm;

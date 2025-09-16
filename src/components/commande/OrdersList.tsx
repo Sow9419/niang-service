@@ -1,32 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Edit, Trash2 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { Commande, CommandeStatus } from '../../types';
-
-const mockCommandes: Commande[] = [
-  { id: 1, order_number: '#1256', client: 'Client E', product: 'Gasoil', quantity: 8000, unit_price: 850, estimated_amount: 6800000, order_date: '25/05/2024', status: 'Non Livré' },
-  { id: 2, order_number: '#1255', client: 'Client D', product: 'Essence', quantity: 5000, unit_price: 850, estimated_amount: 4250000, order_date: '24/05/2024', status: 'Non Livré' },
-  { id: 3, order_number: '#1254', client: 'Client B', product: 'Essence', quantity: 5500, unit_price: 850, estimated_amount: 4675000, order_date: '24/05/2024', status: 'Non Livré' },
-  { id: 4, order_number: '#1253', client: 'Client A', product: 'Gasoil', quantity: 10000, unit_price: 850, estimated_amount: 8500000, order_date: '23/05/2024', status: 'Livré' },
-  { id: 5, order_number: '#1251', client: 'Client F', product: 'Essence', quantity: 3000, unit_price: 850, estimated_amount: 2550000, order_date: '21/05/2024', status: 'Annulée' },
-  { id: 6, order_number: '#1250', client: 'Client G', product: 'Gasoil', quantity: 12000, unit_price: 850, estimated_amount: 10200000, order_date: '20/05/2024', status: 'Livré' },
-];
 
 const ITEMS_PER_PAGE = 5;
 
-const OrderCard: React.FC<{ commande: Commande }> = ({ commande }) => (
+const OrderCard: React.FC<{ commande: Commande; onEdit: (commande: Commande) => void; onDelete: (id: number) => void; }> = ({ commande, onEdit, onDelete }) => (
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
         <div className="flex justify-between items-start mb-3">
             <div>
                 <p className="font-semibold text-gray-900">{commande.order_number}</p>
-                <p className="text-sm text-gray-600">{commande.client}</p>
+                <p className="text-sm text-gray-600">{commande.clients.name}</p>
             </div>
             <StatusBadge status={commande.status} />
         </div>
         <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm text-left border-t border-b py-3 my-3">
             <div>
                 <p className="text-gray-500">Produit</p>
-                <p className="font-medium text-gray-800">{commande.product}</p>
+                <p className="font-medium text-gray-800">{commande.product_type}</p>
             </div>
             <div>
                 <p className="text-gray-500">Quantité</p>
@@ -42,27 +35,50 @@ const OrderCard: React.FC<{ commande: Commande }> = ({ commande }) => (
             </div>
         </div>
         <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500">Date: <span className="font-medium text-gray-700">{commande.order_date}</span></span>
+            <span className="text-gray-500">Date: <span className="font-medium text-gray-700">{new Date(commande.created_at).toLocaleDateString('fr-FR')}</span></span>
              <div className="flex items-center gap-3">
-                <button className="text-orange-500 hover:text-orange-700"><Edit className="w-5 h-5"/></button>
-                <button className="text-red-500 hover:text-red-700"><Trash2 className="w-5 h-5"/></button>
+                <button onClick={() => onEdit(commande)} className="text-orange-500 hover:text-orange-700"><Edit className="w-5 h-5"/></button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <button className="text-red-500 hover:text-red-700"><Trash2 className="w-5 h-5"/></button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Êtes-vous sûr?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Cette action est irréversible. La commande sera définitivement supprimée.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => onDelete(commande.id)}>Supprimer</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
         </div>
     </div>
 );
 
-const OrdersList: React.FC = () => {
+interface OrdersListProps {
+  commandes: Commande[];
+  onEdit: (commande: Commande) => void;
+  onDelete: (id: number) => void;
+  isLoading: boolean;
+}
+
+const OrdersList: React.FC<OrdersListProps> = ({ commandes, onEdit, onDelete, isLoading }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<CommandeStatus | 'Tous'>('Tous');
     const [currentPage, setCurrentPage] = useState(1);
 
     const filteredCommandes = useMemo(() => {
-        return mockCommandes.filter(c => {
-            const searchMatch = c.client.toLowerCase().includes(searchTerm.toLowerCase()) || c.order_number.toLowerCase().includes(searchTerm.toLowerCase());
+        return commandes.filter(c => {
+            const searchMatch = c.clients.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.order_number.toLowerCase().includes(searchTerm.toLowerCase());
             const statusMatch = statusFilter === 'Tous' || c.status === statusFilter;
             return searchMatch && statusMatch;
         });
-    }, [searchTerm, statusFilter]);
+    }, [commandes, searchTerm, statusFilter]);
 
     const totalPages = Math.ceil(filteredCommandes.length / ITEMS_PER_PAGE);
     const paginatedCommandes = filteredCommandes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -75,6 +91,25 @@ const OrdersList: React.FC = () => {
     
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, filteredCommandes.length);
+
+    if (isLoading) {
+        return (
+            <div className="space-y-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+            </div>
+        )
+    }
+
+    if (commandes.length === 0) {
+        return (
+            <div className="text-center py-12">
+                <h3 className="text-xl font-semibold">Aucune commande pour le moment</h3>
+                <p className="text-muted-foreground mt-2">Commencez par créer une nouvelle commande pour la voir apparaître ici.</p>
+            </div>
+        )
+    }
 
     return (
         <section className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
@@ -108,7 +143,7 @@ const OrdersList: React.FC = () => {
 
             {/* Mobile View */}
             <div className="lg:hidden">
-                {paginatedCommandes.map(commande => <OrderCard key={commande.id} commande={commande} />)}
+                {paginatedCommandes.map(commande => <OrderCard key={commande.id} commande={commande} onEdit={onEdit} onDelete={onDelete} />)}
             </div>
 
             {/* Desktop View */}
@@ -131,16 +166,32 @@ const OrdersList: React.FC = () => {
                         {paginatedCommandes.map((commande) => (
                             <tr key={commande.id} className="bg-white border-b hover:bg-gray-50">
                                 <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{commande.order_number}</td>
-                                <td className="px-4 py-4">{commande.client}</td>
-                                <td className="px-4 py-4">{commande.product}</td>
+                                <td className="px-4 py-4">{commande.clients.name}</td>
+                                <td className="px-4 py-4">{commande.product_type}</td>
                                 <td className="px-4 py-4">{commande.quantity.toLocaleString('fr-FR')}</td>
                                 <td className="px-4 py-4">{commande.unit_price.toLocaleString('fr-FR')}</td>
                                 <td className="px-4 py-4">{commande.estimated_amount.toLocaleString('fr-FR')}</td>
-                                <td className="px-4 py-4">{commande.order_date}</td>
+                                <td className="px-4 py-4">{new Date(commande.created_at).toLocaleDateString('fr-FR')}</td>
                                 <td className="px-4 py-4"><StatusBadge status={commande.status} /></td>
                                 <td className="px-4 py-4 flex items-center gap-3">
-                                    <button className="text-orange-500 hover:text-orange-700"><Edit className="w-5 h-5"/></button>
-                                    <button className="text-red-500 hover:text-red-700"><Trash2 className="w-5 h-5"/></button>
+                                    <button onClick={() => onEdit(commande)} className="text-orange-500 hover:text-orange-700"><Edit className="w-5 h-5"/></button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <button className="text-red-500 hover:text-red-700"><Trash2 className="w-5 h-5"/></button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Êtes-vous sûr?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Cette action est irréversible. La commande sera définitivement supprimée.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => onDelete(commande.id)}>Supprimer</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </td>
                             </tr>
                         ))}
