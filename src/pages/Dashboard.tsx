@@ -1,82 +1,115 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Droplets, Wallet, ListOrdered, Truck, Plus } from "lucide-react";
+import BarChartComponent from "@/components/dasboard/BarChartComponent";
+import DonutChartComponent from "@/components/dasboard/DonutChartComponent";
+import KpiCard from "@/components/dasboard/KpiCard";
+import OngoingOrders from "@/components/dasboard/OngoingOrders";
+import RecentDeliveries from "@/components/dasboard/RecentDeliveries";
+import { useDashboardAnalytics, Period } from "@/hooks/useDashboardAnalytics";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold gradient-text">
-          Bienvenue dans FuelManager
-        </h1>
-        <p className="text-muted-foreground text-lg mt-2">
-          Tableau de bord de gestion des livraisons
-        </p>
-      </div>
+    const [activeTab, setActiveTab] = useState<Period>('Mois');
+    const navigator = useNavigate();
+    const { 
+        kpiData,
+        commandesEnCours,
+        livraisonsRecentes,
+        donutChartData,
+        barChartData,
+        isLoading 
+    } = useDashboardAnalytics(activeTab);
 
-      {/* Coming Soon Section */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="glass-effect border-primary/20">
-          <CardHeader className="text-center">
-            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-primary/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-              </svg>
+    const kpiTitlePeriod = `(${activeTab})`;
+
+    return (
+        <div className="space-y-8">
+            {/* Header */}
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Tableau de Bord en Temps Réel</h1>
+                </div>
+                <button onClick={() => navigator('/orders')} className="flex items-center gap-2 bg-orange-500 text-white font-semibold px-4 py-2.5 rounded-xl shadow-md hover:bg-orange-600 transition-colors duration-300 mt-4 sm:mt-0">
+                    <Plus className="w-5 h-5" />
+                    <span>Nouvelle Commande</span>
+                </button>
+            </header>
+
+            {/* KPI Section */}
+            <div className=" p-0 rounded-2xl shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 sm:mb-0">
+                        Indicateurs Clés de Performance
+                    </h2>
+                    <div className="flex items-center bg-white p-1 rounded-full">
+                        {(['Jour', 'Semaine', 'Mois'] as Period[]).map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                                    activeTab === tab ? 'bg-black text-white shadow-sm' : 'text-gray-900 hover:bg-gray-200'
+                                }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                
+                {/* KPI Cards */}
+                <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+                    <KpiCard 
+                        title={`Chiffre d'affaires ${kpiTitlePeriod}`}
+                        value={`${kpiData.revenue.toLocaleString('fr-FR')} CFA`}
+                        change={kpiData.revenueChange.toString()}
+                        changeType={kpiData.revenueChange >= 0 ? 'increase' : 'decrease'}
+                        icon={Wallet}
+                    />
+                    <KpiCard 
+                        title={`Volume livré ${kpiTitlePeriod}`}
+                        value={`${kpiData.volume.toLocaleString('fr-FR')} L`}
+                        change={kpiData.volumeChange.toString()}
+                        changeType={kpiData.volumeChange >= 0 ? 'increase' : 'decrease'}
+                        icon={Droplets}
+                    />
+                    <KpiCard 
+                        title="Commandes en cours"
+                        value={kpiData.orders.toString()}
+                        change={kpiData.ordersChange.toString()}
+                        changeType={kpiData.ordersChange >= 0 ? 'increase' : 'decrease'}
+                        icon={ListOrdered}
+                    />
+                    <KpiCard 
+                        title={`Livraisons ${kpiTitlePeriod}`}
+                        value={kpiData.deliveries.toString()}
+                        change={kpiData.deliveriesChange.toString()}
+                        changeType={kpiData.deliveriesChange >= 0 ? 'increase' : 'decrease'}
+                        icon={Truck}
+                    />
+                </div>
             </div>
-            <CardTitle className="text-lg">Gestion des commandes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground text-center">
-              Créer et suivre les commandes de carburant de vos clients
-            </p>
-          </CardContent>
-        </Card>
 
-        <Card className="glass-effect border-primary/20">
-          <CardHeader className="text-center">
-            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-primary/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-              </svg>
+            {/* Charts */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2">
+                    <BarChartComponent data={barChartData} isLoading={isLoading} />
+                </div>
+                <div className="lg:col-span-1">
+                    <DonutChartComponent data={donutChartData} isLoading={isLoading} />
+                </div>
             </div>
-            <CardTitle className="text-lg">Suivi des citernes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground text-center">
-              Suivre l'état et la position de votre flotte de citernes
-            </p>
-          </CardContent>
-        </Card>
 
-        <Card className="glass-effect border-primary/20">
-          <CardHeader className="text-center">
-            <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-primary/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-              </svg>
+            {/* Recent Activities */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2">
+                    <RecentDeliveries deliveries={livraisonsRecentes} isLoading={isLoading} />
+                </div>
+                <div className="lg:col-span-1">
+                    <OngoingOrders orders={commandesEnCours} isLoading={isLoading} />
+                </div>
             </div>
-            <CardTitle className="text-lg">Tableau de bord</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground text-center">
-              Analyses et KPIs de vos opérations de livraison
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-8 text-center">
-        <Card className="glass-effect border-primary/20 inline-block">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-2 gradient-text">
-              Application en développement
-            </h3>
-            <p className="text-muted-foreground">
-              Les fonctionnalités principales seront bientôt disponibles
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }
+

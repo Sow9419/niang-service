@@ -25,8 +25,8 @@ const MobileNav: React.FC<MobileNavProps> = ({ deliveryCount = 0 }) => {
             <Link
               key={item.path}
               to={item.path}
-              className={`relative flex flex-col items-center justify-center gap-1 w-16 h-16 rounded-xl transition-all duration-300 ${
-                currentPage === item.path ? 'text-orange-500 -translate-y-2 bg-orange-50 shadow-md' : 'text-gray-400'
+              className={`relative flex items-center justify-center gap-1 w-auto h-10 px-4 rounded-full transition-all duration-300 ${
+                currentPage === item.path ? 'text-orange-500 -translate-y-0 bg-orange-50 shadow-none' : 'text-gray-400'
               }`}
               aria-label={item.label}
             >

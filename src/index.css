@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Fuel & Tanker Theme Colors */
-    --background: 220 15% 8%;
+    --background: 220 15% 90%;
     --foreground: 0 0% 95%;
 
     --card: 220 15% 10%;

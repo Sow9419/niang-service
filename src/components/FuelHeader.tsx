@@ -92,7 +92,7 @@ export default function FuelHeader() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
                 <h3 className="font-semibold text-xl mb-2">Starter</h3>
-                <div className="text-3xl font-bold text-primary mb-4">29€<span className="text-sm font-normal text-muted-foreground">/mois</span></div>
+                <div className="text-3xl font-bold text-primary mb-4">29CFA<span className="text-sm font-normal text-muted-foreground">/mois</span></div>
                 <ul className="space-y-2 mb-6">
                   <li className="text-sm">✓ Jusqu'à 5 citernes</li>
                   <li className="text-sm">✓ Monitoring basique</li>
@@ -104,7 +104,7 @@ export default function FuelHeader() {
               <div className="p-6 border-2 border-primary rounded-lg relative">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs">Populaire</div>
                 <h3 className="font-semibold text-xl mb-2">Professionnel</h3>
-                <div className="text-3xl font-bold text-primary mb-4">89€<span className="text-sm font-normal text-muted-foreground">/mois</span></div>
+                <div className="text-3xl font-bold text-primary mb-4">89CFA<span className="text-sm font-normal text-muted-foreground">/mois</span></div>
                 <ul className="space-y-2 mb-6">
                   <li className="text-sm">✓ Citernes illimitées</li>
                   <li className="text-sm">✓ Monitoring avancé</li>
