@@ -44,8 +44,8 @@ const DeliveryCard: React.FC<{
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
         <div className="flex justify-between items-start mb-3">
             <div>
-                <p className="font-semibold text-gray-900">Commande {livraison.commandes.order_number}</p>
-                <p className="text-sm text-gray-600">{livraison.commandes.clients.name}</p>
+                <p className="font-semibold text-gray-900">Commande {livraison.commandes?.order_number}</p>
+                <p className="text-sm text-gray-600">{livraison.commandes?.clients?.name}</p>
             </div>
             <Select value={livraison.status} onValueChange={(value) => onDeliveryStatusChange(livraison.id, value as LivraisonStatus)}>
                 <SelectTrigger className={`${baseSelectClasses} ${deliveryStatusStyles[livraison.status]}`}>
@@ -61,7 +61,7 @@ const DeliveryCard: React.FC<{
         <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm text-left border-t border-b py-3 my-3">
             <div>
                 <p className="text-gray-500">Quantité Cmd.</p>
-                <p className="font-medium text-gray-800">{livraison.commandes.quantity.toLocaleString('fr-FR')} L</p>
+                <p className="font-medium text-gray-800">{livraison.commandes?.quantity?.toLocaleString('fr-FR')} L</p>
             </div>
              <div>
                 <p className="text-gray-500">Citerne</p>
@@ -79,7 +79,7 @@ const DeliveryCard: React.FC<{
             </div>
         </div>
         <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500">Date: <span className="font-medium text-gray-700">{new Date(livraison.date_livraison).toLocaleDateString('fr-FR')}</span></span>
+            <span className="text-gray-500">Date: <span className="font-medium text-gray-700">{livraison.date_livraison ? new Date(livraison.date_livraison).toLocaleDateString('fr-FR') : 'Non définie'}</span></span>
              <div className="flex items-center gap-4">
                 <Select value={livraison.payment_status} onValueChange={(value) => onPaymentStatusChange(livraison.id, value as LivraisonPaymentStatus)}>
                     <SelectTrigger className={`${baseSelectClasses} ${paymentStatusStyles[livraison.payment_status]}`}>
@@ -121,7 +121,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
 
     const filteredLivraisons = useMemo(() => {
         return livraisons.filter(l => {
-            const searchMatch = l.commandes.clients.name.toLowerCase().includes(searchTerm.toLowerCase()) || l.commandes.order_number.toLowerCase().includes(searchTerm.toLowerCase());
+            const searchMatch = l.commandes?.clients?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || l.commandes?.order_number?.toLowerCase().includes(searchTerm.toLowerCase());
             const statusMatch = statusFilter === 'Tous' || l.status === statusFilter;
             return searchMatch && statusMatch;
         });
@@ -205,13 +205,13 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                             const isEditing = livraison.id === editingDeliveryId;
                             return (
                                 <tr key={livraison.id} className="bg-white border-b hover:bg-gray-50">
-                                    <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{livraison.commandes.order_number}</td>
-                                    <td className="px-4 py-4">{livraison.commandes.clients.name}</td>
-                                    <td className="px-4 py-4 font-medium text-gray-800">{livraison.commandes.quantity.toLocaleString('fr-FR')} L</td>
-                                    <td className="px-4 py-4">{livraison.volume_livre.toLocaleString('fr-FR')} L</td>
-                                    <td className={`px-4 py-4 font-medium ${livraison.volume_manquant > 0 ? 'text-red-600' : ''}`}>{livraison.volume_manquant.toLocaleString('fr-FR')} L</td>
+                                    <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{livraison.commandes?.order_number}</td>
+                                    <td className="px-4 py-4">{livraison.commandes?.clients?.name}</td>
+                                    <td className="px-4 py-4 font-medium text-gray-800">{livraison.commandes?.quantity?.toLocaleString('fr-FR')} L</td>
+                                    <td className="px-4 py-4">{livraison.volume_livre?.toLocaleString('fr-FR')} L</td>
+                                    <td className={`px-4 py-4 font-medium ${livraison.volume_manquant > 0 ? 'text-red-600' : ''}`}>{livraison.volume_manquant?.toLocaleString('fr-FR')} L</td>
                                     <td className="px-4 py-4">{livraison.citernes?.registration || 'Non assignée'}</td>
-                                    <td className="px-4 py-4">{new Date(livraison.date_livraison).toLocaleDateString('fr-FR')}</td>
+                                    <td className="px-4 py-4">{livraison.date_livraison ? new Date(livraison.date_livraison).toLocaleDateString('fr-FR') : 'Non définie'}</td>
                                     <td className="px-4 py-4">
                                         <Select value={livraison.status} onValueChange={(value) => handleDeliveryStatusChange(livraison.id, value as LivraisonStatus)}>
                                             <SelectTrigger className={`${baseSelectClasses} ${deliveryStatusStyles[livraison.status]}`}>
