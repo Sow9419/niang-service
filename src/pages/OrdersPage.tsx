@@ -52,21 +52,21 @@ export default function OrdersPage() {
         )}
       </div>
 
-      {isFormVisible ? (
+      {isFormVisible && (
         <CreateOrderForm
           onClose={handleCloseForm}
           onSubmit={handleFormSubmit}
           clients={clients}
           commande={editingOrder}
         />
-      ) : (
-        <OrdersList
-          commandes={commandes}
-          onEdit={handleShowEditForm}
-          onDelete={deleteCommande}
-          isLoading={loadingCommandes || loadingClients}
-        />
       )}
+
+      <OrdersList
+        commandes={commandes}
+        onEdit={handleShowEditForm}
+        onDelete={deleteCommande}
+        isLoading={loadingCommandes || loadingClients}
+      />
     </div>
   );
 }

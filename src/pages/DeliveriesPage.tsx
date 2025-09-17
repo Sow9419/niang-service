@@ -56,20 +56,13 @@ export default function DeliveriesPage() {
         />
       )}
 
-      {isLoading ? (
-        <div className="space-y-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-        </div>
-      ) : (
-        <DeliveriesList
-          livraisons={livraisons}
-          onEdit={handleEditDelivery}
-          editingDeliveryId={editingDelivery?.id || null}
-          onUpdate={updateLivraison}
-        />
-      )}
+      <DeliveriesList
+        livraisons={livraisons}
+        onEdit={handleEditDelivery}
+        editingDeliveryId={editingDelivery?.id || null}
+        onUpdate={updateLivraison}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
