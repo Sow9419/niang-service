@@ -57,23 +57,23 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
             try {
                 const { start, p_start, p_end } = getDates(period);
 
-                const p1 = supabase.from('commandes').select('estimated_amount').gte('created_at', start);
-                const p2 = supabase.from('commandes').select('estimated_amount').gte('created_at', p_start).lt('created_at', p_end);
+                const p1 = supabase.from('livraisons').select('montant_total').eq('status', 'Livré').gte('created_at', start);
+                const p2 = supabase.from('livraisons').select('montant_total').eq('status', 'Livré').gte('created_at', p_start).lt('created_at', p_end);
                 const p3 = supabase.from('livraisons').select('volume_livre').eq('status', 'Livré').gte('date_livraison', start);
                 const p4 = supabase.from('livraisons').select('volume_livre').eq('status', 'Livré').gte('date_livraison', p_start).lt('date_livraison', p_end);
                 const p5 = supabase.from('commandes').select('id', { count: 'exact' }).in('status', ['Non Livré']);
                 const p6 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('status', 'Livré').gte('date_livraison', start);
                 const p7 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('status', 'Livré').gte('date_livraison', p_start).lt('date_livraison', p_end);
                 const p8 = supabase.from('commandes').select(`id, status, quantity, estimated_amount, clients ( name )`).in('status', ['Non Livré', 'Livré']).order('created_at', { ascending: false }).limit(3);
-                const p9 = supabase.from('livraisons').select(`id, status, date_livraison, commandes ( quantity, clients ( name ) )`).order('date_livraison', { ascending: false }).limit(3);
+                const p9 = supabase.from('livraisons').select(`id, status, date_livraison, volume_livre, commandes ( quantity, clients ( name ) )`).eq('status', 'Livré').order('date_livraison', { ascending: false }).limit(3);
 
                 const [ 
                     currentRevenueRes, previousRevenueRes, currentVolumeRes, previousVolumeRes, 
                     ordersRes, currentDeliveriesRes, previousDeliveriesRes, commandesRes, livraisonsRes
                 ] = await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8, p9]);
 
-                const currentRevenue = currentRevenueRes.data?.reduce((sum, item) => sum + (item.estimated_amount || 0), 0) || 0;
-                const previousRevenue = previousRevenueRes.data?.reduce((sum, item) => sum + (item.estimated_amount || 0), 0) || 0;
+                const currentRevenue = currentRevenueRes.data?.reduce((sum, item) => sum + (item.montant_total || 0), 0) || 0;
+                const previousRevenue = previousRevenueRes.data?.reduce((sum, item) => sum + (item.montant_total || 0), 0) || 0;
                 const currentVolume = currentVolumeRes.data?.reduce((sum, item) => sum + (item.volume_livre || 0), 0) || 0;
                 const previousVolume = previousVolumeRes.data?.reduce((sum, item) => sum + (item.volume_livre || 0), 0) || 0;
                 
@@ -94,14 +94,13 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
                 if (livraisonsRes.error) throw livraisonsRes.error;
                 setLivraisonsRecentes(livraisonsRes.data as LivraisonRecente[]);
 
-                // Calculer le volume manquant total
-                const totalVolumeCommande = await supabase
-                    .from('commandes')
-                    .select('quantity')
+                // Calculer le volume manquant total depuis les livraisons
+                const totalVolumeManquant = await supabase
+                    .from('livraisons')
+                    .select('volume_manquant')
                     .gte('created_at', start);
                 
-                const totalCommandeVolume = totalVolumeCommande.data?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
-                const volumeManquant = Math.max(0, totalCommandeVolume - currentVolume);
+                const volumeManquant = totalVolumeManquant.data?.reduce((sum, item) => sum + (item.volume_manquant || 0), 0) || 0;
 
                 setDonutChartData([
                     { name: 'Volume livré', value: currentVolume },
@@ -122,13 +121,13 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
 
                     const dayRevenue = await supabase
                         .from('livraisons')
-                        .select('commandes!inner(estimated_amount)')
+                        .select('montant_total')
                         .eq('status', 'Livré')
                         .gte('date_livraison', dayStart.toISOString().split('T')[0])
                         .lte('date_livraison', dayEnd.toISOString().split('T')[0]);
 
                     const revenue = dayRevenue.data?.reduce((sum: number, item: any) => {
-                        return sum + (item.commandes?.estimated_amount || 0);
+                        return sum + (item.montant_total || 0);
                     }, 0) || 0;
 
                     dailyRevenueData.push({

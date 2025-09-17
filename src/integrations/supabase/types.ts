@@ -184,6 +184,7 @@ export type Database = {
           created_at: string
           date_livraison: string | null
           id: number
+          montant_total: number | null
           payment_status: Database["public"]["Enums"]["statut_paiement"]
           status: Database["public"]["Enums"]["statut_commun"]
           updated_at: string
@@ -197,6 +198,7 @@ export type Database = {
           created_at?: string
           date_livraison?: string | null
           id?: number
+          montant_total?: number | null
           payment_status?: Database["public"]["Enums"]["statut_paiement"]
           status?: Database["public"]["Enums"]["statut_commun"]
           updated_at?: string
@@ -210,6 +212,7 @@ export type Database = {
           created_at?: string
           date_livraison?: string | null
           id?: number
+          montant_total?: number | null
           payment_status?: Database["public"]["Enums"]["statut_paiement"]
           status?: Database["public"]["Enums"]["statut_commun"]
           updated_at?: string

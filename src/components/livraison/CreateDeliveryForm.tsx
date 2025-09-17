@@ -44,6 +44,7 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
 
   const selectedCommande = commandes.find(c => c.id === selectedCommandeId);
   const volumeLivre = selectedCommande ? selectedCommande.quantity - (volumeManquant || 0) : 0;
+  const montantTotal = selectedCommande ? volumeLivre * selectedCommande.unit_price : 0;
 
   useEffect(() => {
     if (deliveryData) {
@@ -59,7 +60,7 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
   }, [deliveryData, form]);
 
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit({ ...values, volume_livre: volumeLivre } as any);
+    onSubmit({ ...values, volume_livre: volumeLivre, montant_total: montantTotal } as any);
   };
 
   return (
@@ -142,6 +143,10 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
             <FormItem>
               <FormLabel>Volume livré (L)</FormLabel>
               <Input value={volumeLivre.toLocaleString('fr-FR')} disabled className="bg-gray-100" />
+            </FormItem>
+            <FormItem>
+              <FormLabel>Montant Total (FCFA)</FormLabel>
+              <Input value={montantTotal.toLocaleString('fr-FR')} disabled className="bg-gray-100" />
             </FormItem>
             <FormField
               control={form.control}

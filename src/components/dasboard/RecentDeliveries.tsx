@@ -65,7 +65,7 @@ const RecentDeliveries: React.FC<RecentDeliveriesProps> = ({ deliveries, isLoadi
                 deliveries.map((delivery) => (
                   <tr key={delivery.id} className="border-b border-gray-100 last:border-b-0">
                     <td className="py-4 px-2 font-semibold text-gray-800">{(delivery as any).commandes?.clients?.name || 'N/A'}</td>
-                    <td className="py-4 px-2 text-gray-600">{(delivery as any).commandes?.quantity} L</td>
+                    <td className="py-4 px-2 text-gray-600">{(delivery as any).volume_livre || 0} L</td>
                     <td className="py-4 px-2 text-gray-600 hidden sm:table-cell">
                         {delivery.date_livraison ? new Date(delivery.date_livraison).toLocaleDateString('fr-FR') : 'N/A'}
                     </td>

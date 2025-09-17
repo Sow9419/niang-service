@@ -68,11 +68,21 @@ export function useLivraisons() {
       // Calculer automatiquement le volume livré
       const volumeLivre = commandeQuantity - livraisonData.volume_manquant;
       
+      // Récupérer le prix unitaire de la commande pour calculer le montant total
+      const { data: commandeData } = await supabase
+        .from('commandes')
+        .select('unit_price')
+        .eq('id', livraisonData.commande_id)
+        .single();
+      
+      const montantTotal = volumeLivre * (commandeData?.unit_price || 0);
+      
       const { data, error } = await supabase
         .from('livraisons')
         .insert([{ 
           ...livraisonData, 
           volume_livre: volumeLivre,
+          montant_total: montantTotal,
           user_id: user.id 
         }])
         .select(`
