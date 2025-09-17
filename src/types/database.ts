@@ -53,6 +53,7 @@ export interface Commande {
   order_date: string;
   status: StatutCommun;
   user_id?: string;
+  clients?: Client;
 }
 
 export interface Livraison {
@@ -60,13 +61,15 @@ export interface Livraison {
   created_at: string;
   updated_at: string;
   commande_id: number;
-  citerne_id: string;
+  citerne_id?: string | null;
   volume_livre: number;
   volume_manquant: number;
-  date_livraison: string;
+  date_livraison?: string | null;
   status: StatutCommun;
   payment_status: StatutPaiement;
   user_id?: string;
+  commandes?: Commande;
+  citernes?: Citerne | null;
 }
 
 // Types pour les insertions (sans id, dates auto)

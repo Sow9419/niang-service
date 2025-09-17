@@ -55,14 +55,14 @@ const OngoingOrders: React.FC<OngoingOrdersProps> = ({ orders, isLoading }) => {
         {orders.length > 0 ? (
             orders.map((order) => (
               <div key={order.id} className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl">
-                <OrderIcon statut={order.statut} />
+                <OrderIcon statut={(order as any).status} />
                 <div className="flex-grow">
                   <p className="font-semibold text-gray-800">Commande #{order.id.toString().slice(-4)}</p>
                   <p className="text-xs text-gray-500">
-                    {order.clients?.nom} - {order.quantite_commandee} L
+                    {(order as any).clients?.name} - {(order as any).quantity} L
                   </p>
                 </div>
-                <p className="font-bold text-gray-800">{order.prix_total?.toLocaleString('fr-FR')} CFA</p>
+                <p className="font-bold text-gray-800">{(order as any).estimated_amount?.toLocaleString('fr-FR')} CFA</p>
               </div>
             ))
         ) : (

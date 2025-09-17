@@ -48,7 +48,7 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
     const success = isEditMode
       ? await updateCiterne({ ...values, id: citerneToEdit.id })
-      : await createCiterne(values);
+      : await createCiterne(values as any);
 
     if (success) {
       form.reset();

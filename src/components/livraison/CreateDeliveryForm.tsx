@@ -49,7 +49,7 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
     if (deliveryData) {
       form.reset({
         commande_id: deliveryData.commande_id,
-        citerne_id: deliveryData.citerne_id,
+        citerne_id: deliveryData.citerne_id as any,
         volume_manquant: deliveryData.volume_manquant,
         date_livraison: new Date(deliveryData.date_livraison).toISOString().split('T')[0],
         status: deliveryData.status,
@@ -59,7 +59,7 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
   }, [deliveryData, form]);
 
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit({ ...values, volume_livre: volumeLivre });
+    onSubmit({ ...values, volume_livre: volumeLivre } as any);
   };
 
   return (

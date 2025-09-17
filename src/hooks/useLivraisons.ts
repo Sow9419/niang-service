@@ -47,7 +47,7 @@ export function useLivraisons() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setLivraisons(data || []);
+      setLivraisons(data as any || []);
     } catch (error) {
       console.error('Error fetching livraisons:', error);
       toast({
@@ -110,7 +110,7 @@ export function useLivraisons() {
         .update({ status: data.status })
         .eq('id', data.commande_id);
 
-      setLivraisons(prev => [data, ...prev]);
+      setLivraisons(prev => [data as any, ...prev]);
       toast({
         title: "Succès",
         description: "Livraison créée avec succès",
@@ -179,7 +179,7 @@ export function useLivraisons() {
       }
 
       setLivraisons(prev => prev.map(livraison => 
-        livraison.id === livraisonData.id ? data : livraison
+        livraison.id === livraisonData.id ? data as any : livraison
       ));
       toast({
         title: "Succès",

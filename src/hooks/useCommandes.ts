@@ -33,7 +33,7 @@ export function useCommandes() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCommandes(data || []);
+      setCommandes(data as any || []);
     } catch (error) {
       console.error('Error fetching commandes:', error);
       toast({
@@ -51,15 +51,11 @@ export function useCommandes() {
     if (!user) return null;
 
     try {
-      // Générer un numéro de commande unique
-      const orderNumber = `CMD-${Date.now()}`;
-      
       const { data, error } = await supabase
         .from('commandes')
         .insert([{ 
           ...commandeData, 
-          user_id: user.id,
-          order_number: orderNumber 
+          user_id: user.id
         }])
         .select(`
           *,
@@ -76,7 +72,7 @@ export function useCommandes() {
 
       if (error) throw error;
 
-      setCommandes(prev => [data, ...prev]);
+      setCommandes(prev => [data as any, ...prev]);
       toast({
         title: "Succès",
         description: "Commande créée avec succès",
@@ -117,7 +113,7 @@ export function useCommandes() {
       if (error) throw error;
 
       setCommandes(prev => prev.map(commande => 
-        commande.id === commandeData.id ? data : commande
+        commande.id === commandeData.id ? data as any : commande
       ));
       toast({
         title: "Succès",

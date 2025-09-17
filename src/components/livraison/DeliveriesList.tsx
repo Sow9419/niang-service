@@ -65,7 +65,7 @@ const DeliveryCard: React.FC<{
             </div>
              <div>
                 <p className="text-gray-500">Citerne</p>
-                <p className="font-medium text-gray-800">{livraison.citernes.registration}</p>
+                <p className="font-medium text-gray-800">{livraison.citernes?.registration || 'Non assignée'}</p>
             </div>
             <div>
                 <p className="text-gray-500">Volume Livré</p>
@@ -210,7 +210,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                                     <td className="px-4 py-4 font-medium text-gray-800">{livraison.commandes.quantity.toLocaleString('fr-FR')} L</td>
                                     <td className="px-4 py-4">{livraison.volume_livre.toLocaleString('fr-FR')} L</td>
                                     <td className={`px-4 py-4 font-medium ${livraison.volume_manquant > 0 ? 'text-red-600' : ''}`}>{livraison.volume_manquant.toLocaleString('fr-FR')} L</td>
-                                    <td className="px-4 py-4">{livraison.citernes.registration}</td>
+                                    <td className="px-4 py-4">{livraison.citernes?.registration || 'Non assignée'}</td>
                                     <td className="px-4 py-4">{new Date(livraison.date_livraison).toLocaleDateString('fr-FR')}</td>
                                     <td className="px-4 py-4">
                                         <Select value={livraison.status} onValueChange={(value) => handleDeliveryStatusChange(livraison.id, value as LivraisonStatus)}>

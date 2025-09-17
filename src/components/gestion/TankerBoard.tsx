@@ -88,7 +88,7 @@ const TankerBoard: React.FC<TankerBoardProps> = ({ tankers, drivers, onUpdateTan
     const findContainer = (id: string | number) => {
         if (typeof id === 'number') {
             for (const status of Object.keys(boardState) as TankerStatus[]) {
-                if (boardState[status].find(item => item.id === id)) {
+                if (boardState[status].find(item => item.id === String(id))) {
                     return status;
                 }
             }

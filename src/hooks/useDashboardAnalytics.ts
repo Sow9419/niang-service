@@ -57,25 +57,25 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
             try {
                 const { start, p_start, p_end } = getDates(period);
 
-                const p1 = supabase.from('commandes').select('prix_total').gte('created_at', start);
-                const p2 = supabase.from('commandes').select('prix_total').gte('created_at', p_start).lt('created_at', p_end);
-                const p3 = supabase.from('livraisons').select('quantite_livree').eq('statut', 'livree').gte('date_livraison', start);
-                const p4 = supabase.from('livraisons').select('quantite_livree').eq('statut', 'livree').gte('date_livraison', p_start).lt('date_livraison', p_end);
-                const p5 = supabase.from('commandes').select('id', { count: 'exact' }).in('statut', ['en_cours', 'en_livraison']);
-                const p6 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('statut', 'livree').gte('date_livraison', start);
-                const p7 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('statut', 'livree').gte('date_livraison', p_start).lt('date_livraison', p_end);
-                const p8 = supabase.from('commandes').select(`id, statut, quantite_commandee, prix_total, clients ( nom )`).in('statut', ['en_cours', 'en_livraison']).order('created_at', { ascending: false }).limit(3);
-                const p9 = supabase.from('livraisons').select(`id, statut, date_livraison, commandes ( quantite_commandee, clients ( nom ) )`).order('date_livraison', { ascending: false }).limit(3);
+                const p1 = supabase.from('commandes').select('estimated_amount').gte('created_at', start);
+                const p2 = supabase.from('commandes').select('estimated_amount').gte('created_at', p_start).lt('created_at', p_end);
+                const p3 = supabase.from('livraisons').select('volume_livre').eq('status', 'Livré').gte('date_livraison', start);
+                const p4 = supabase.from('livraisons').select('volume_livre').eq('status', 'Livré').gte('date_livraison', p_start).lt('date_livraison', p_end);
+                const p5 = supabase.from('commandes').select('id', { count: 'exact' }).in('status', ['Non Livré']);
+                const p6 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('status', 'Livré').gte('date_livraison', start);
+                const p7 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('status', 'Livré').gte('date_livraison', p_start).lt('date_livraison', p_end);
+                const p8 = supabase.from('commandes').select(`id, status, quantity, estimated_amount, clients ( name )`).in('status', ['Non Livré', 'Livré']).order('created_at', { ascending: false }).limit(3);
+                const p9 = supabase.from('livraisons').select(`id, status, date_livraison, commandes ( quantity, clients ( name ) )`).order('date_livraison', { ascending: false }).limit(3);
 
                 const [ 
                     currentRevenueRes, previousRevenueRes, currentVolumeRes, previousVolumeRes, 
                     ordersRes, currentDeliveriesRes, previousDeliveriesRes, commandesRes, livraisonsRes
                 ] = await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8, p9]);
 
-                const currentRevenue = currentRevenueRes.data?.reduce((sum, item) => sum + (item.prix_total || 0), 0) || 0;
-                const previousRevenue = previousRevenueRes.data?.reduce((sum, item) => sum + (item.prix_total || 0), 0) || 0;
-                const currentVolume = currentVolumeRes.data?.reduce((sum, item) => sum + (item.quantite_livree || 0), 0) || 0;
-                const previousVolume = previousVolumeRes.data?.reduce((sum, item) => sum + (item.quantite_livree || 0), 0) || 0;
+                const currentRevenue = currentRevenueRes.data?.reduce((sum, item) => sum + (item.estimated_amount || 0), 0) || 0;
+                const previousRevenue = previousRevenueRes.data?.reduce((sum, item) => sum + (item.estimated_amount || 0), 0) || 0;
+                const currentVolume = currentVolumeRes.data?.reduce((sum, item) => sum + (item.volume_livre || 0), 0) || 0;
+                const previousVolume = previousVolumeRes.data?.reduce((sum, item) => sum + (item.volume_livre || 0), 0) || 0;
                 
                 setKpiData({
                     revenue: currentRevenue,

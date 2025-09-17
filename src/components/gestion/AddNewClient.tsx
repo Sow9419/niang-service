@@ -53,7 +53,7 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
     const { data: { user } } = await supabase.auth.getUser();
     const success = isEditMode
       ? await updateClient({ ...values, id: clientToEdit.id, user_id: user?.id })
-      : await createClient({ ...values, user_id: user?.id });
+      : await createClient({ ...values, user_id: user?.id } as any);
 
     if (success) {
       form.reset();

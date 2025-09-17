@@ -57,9 +57,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit({
       ...values,
+      order_number: `CMD-${Date.now()}`,
       estimated_amount: estimatedAmount,
       order_date: new Date().toISOString().split('T')[0],
-    });
+    } as any);
   };
 
   return (
