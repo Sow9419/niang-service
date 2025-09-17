@@ -4,13 +4,14 @@ import { SortableContext, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Citerne, Conducteur, CiterneUpdate } from '../../types';
 import { GripVertical } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
-type TankerStatus = 'Disponible' | 'En livraison' | 'En maintenance';
+type TankerStatus = 'Disponible' | 'En livraison';
 
 const statusToColor: Record<TankerStatus, string> = {
     'Disponible': 'bg-green-500',
     'En livraison': 'bg-blue-500',
-    'En maintenance': 'bg-yellow-500',
 };
 
 const SortableTankerCard: React.FC<{ tanker: Citerne; driverName: string | null }> = ({ tanker, driverName }) => {
@@ -19,50 +20,50 @@ const SortableTankerCard: React.FC<{ tanker: Citerne; driverName: string | null 
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 10 : 'auto',
     };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} className="bg-white p-4 rounded-xl shadow-sm border touch-none">
-            <div className="flex justify-between items-start">
-                <h4 className="font-bold text-lg text-gray-800">{tanker.registration}</h4>
+        <Card ref={setNodeRef} style={style} {...attributes} className="touch-none bg-white shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <div className="font-bold text-black">{tanker.registration}</div>
                 <button {...listeners} className="p-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing">
                     <GripVertical className="w-5 h-5" />
                 </button>
-            </div>
-            <p className="text-gray-500 mt-2 text-sm">{driverName || 'Non assigné'}</p>
-            <p className="text-xs text-gray-400 mt-2">Capacité: {tanker.capacity_liters.toLocaleString()} L</p>
-        </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+                <p className="text-sm text-gray-600">{driverName || 'Non assigné'}</p>
+                <p className="text-xs text-gray-500 mt-2">Capacité: {tanker.capacity_liters.toLocaleString()} L</p>
+            </CardContent>
+        </Card>
     );
 };
 
 const TankerColumn: React.FC<{ title: TankerStatus; tankers: Citerne[]; drivers: Conducteur[] }> = ({ title, tankers, drivers }) => {
-    const { setNodeRef } = useSortable({ id: title });
-
-    const getDriverName = (driverId: number | null) => {
+    const getDriverName = (driverId: string | null) => {
         if (driverId === null) return null;
         const driver = drivers.find(d => d.id === driverId);
         return driver ? driver.name : 'Inconnu';
     };
 
     return (
-        <div className="bg-gray-50/60 p-4 rounded-2xl h-full">
-            <div className="flex items-center gap-3 mb-4">
+        <Card className="bg-white border-gray-200 shadow-sm">
+            <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-3">
                 <span className={`w-3 h-3 rounded-full ${statusToColor[title]}`}></span>
-                <h3 className="font-bold text-lg text-gray-800">{title}</h3>
-                <span className="text-gray-400 font-semibold">{tankers.length}</span>
-            </div>
-            <SortableContext id={title} items={tankers.map(t => t.id)}>
-                <div className="space-y-4">
+                <CardTitle className="text-base font-semibold text-gray-700">{title}</CardTitle>
+                <span className="text-gray-500 font-semibold ml-auto bg-gray-100 rounded-full px-2 py-0.5 text-xs">{tankers.length}</span>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4 min-h-[200px]">
+                <SortableContext id={title} items={tankers.map(t => t.id)}>
                     {tankers.map(tanker => (
                         <SortableTankerCard key={tanker.id} tanker={tanker} driverName={getDriverName(tanker.assigned_driver_id)} />
                     ))}
-                </div>
-            </SortableContext>
-        </div>
+                </SortableContext>
+            </CardContent>
+        </Card>
     );
 };
 
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface TankerBoardProps {
   tankers: Citerne[];
@@ -75,23 +76,24 @@ const TankerBoard: React.FC<TankerBoardProps> = ({ tankers, drivers, onUpdateTan
     const [boardState, setBoardState] = useState<Record<TankerStatus, Citerne[]>>({
         'Disponible': [],
         'En livraison': [],
-        'En maintenance': [],
     });
 
     useEffect(() => {
         setBoardState({
             'Disponible': tankers.filter(t => t.status === 'Disponible'),
             'En livraison': tankers.filter(t => t.status === 'En livraison'),
-            'En maintenance': tankers.filter(t => t.status === 'En maintenance'),
         });
     }, [tankers]);
 
     const findContainer = (id: string | number) => {
-        for (const status of Object.keys(boardState) as TankerStatus[]) {
-            if (boardState[status].find(item => item.id === id)) {
-                return status;
+        if (typeof id === 'number') {
+            for (const status of Object.keys(boardState) as TankerStatus[]) {
+                if (boardState[status].find(item => item.id === id)) {
+                    return status;
+                }
             }
         }
+        return id as TankerStatus;
     };
 
     const sensors = useSensors(
@@ -107,7 +109,7 @@ const TankerBoard: React.FC<TankerBoardProps> = ({ tankers, drivers, onUpdateTan
         if (!over) return;
 
         const activeContainer = findContainer(active.id);
-        const overContainer = findContainer(over.id) || over.id as TankerStatus;
+        const overContainer = findContainer(over.id);
 
         if (!activeContainer || !overContainer || activeContainer === overContainer) {
             return;
@@ -117,55 +119,64 @@ const TankerBoard: React.FC<TankerBoardProps> = ({ tankers, drivers, onUpdateTan
             const activeItems = prev[activeContainer];
             const overItems = prev[overContainer];
             const activeIndex = activeItems.findIndex(item => item.id === active.id);
+            const overIndex = overItems.findIndex(item => item.id === over.id);
 
-            const [movedItem] = activeItems.splice(activeIndex, 1);
-            overItems.push(movedItem);
+            let newBoardState = { ...prev };
+            let movedItem;
 
-            return { ...prev };
+            if (activeContainer === overContainer) {
+                newBoardState[activeContainer] = arrayMove(overItems, activeIndex, overIndex);
+            } else {
+                [movedItem] = activeItems.splice(activeIndex, 1);
+                if (overIndex !== -1) {
+                    overItems.splice(overIndex, 0, movedItem);
+                } else {
+                    overItems.push(movedItem);
+                }
+                newBoardState[activeContainer] = [...activeItems];
+                newBoardState[overContainer] = [...overItems];
+            }
+            
+            return newBoardState;
         });
 
         onUpdateTanker({ id: active.id, status: overContainer });
     };
 
 
-    const columns: TankerStatus[] = ['Disponible', 'En livraison', 'En maintenance'];
+    const columns: TankerStatus[] = ['Disponible', 'En livraison'];
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {columns.map(status => (
-                    <div key={status} className="bg-gray-50/60 p-4 rounded-2xl h-full space-y-4">
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
+                    <div key={status} className="bg-white p-4 rounded-lg h-full space-y-4 border shadow-sm">
+                        <Skeleton className="h-6 w-3/4 bg-gray-200" />
+                        <Skeleton className="h-24 w-full bg-gray-200" />
+                        <Skeleton className="h-24 w-full bg-gray-200" />
                     </div>
                 ))}
             </div>
         );
     }
 
-    if (tankers.length === 0) {
-        return (
-            <div className="text-center py-12 border-2 border-dashed rounded-2xl">
-                <h3 className="text-xl font-semibold">Aucune citerne enregistrée</h3>
-                <p className="text-muted-foreground mt-2">Commencez par ajouter une nouvelle citerne à votre flotte.</p>
-            </div>
-        )
-    }
-
     return (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {columns.map(status => (
-                    <TankerColumn
-                        key={status}
-                        title={status}
-                        tankers={boardState[status]}
-                        drivers={drivers}
-                    />
-                ))}
-            </div>
-        </DndContext>
+        <div className="w-auto">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Flotte de Citernes</h2>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    {columns.map(status => (
+                        <SortableContext key={status} items={boardState[status]?.map(c => c.id) || []}>
+                            <TankerColumn
+                                title={status}
+                                tankers={boardState[status] || []}
+                                drivers={drivers}
+                            />
+                        </SortableContext>
+                    ))}
+                </div>
+            </DndContext>
+        </div>
     );
 };
 

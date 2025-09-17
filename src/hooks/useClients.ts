@@ -1,79 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Client, ClientInsert, ClientUpdate } from '@/types';
+import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from './useAuth';
-import { useToast } from './use-toast';
-import type { Client, ClientInsert, ClientUpdate } from '@/types/database';
 
 export function useClients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  // Charger tous les clients
-  const fetchClients = async () => {
-    if (!user) return;
+  const fetchClients = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setClients(data || []);
-    } catch (error) {
+    if (error) {
       console.error('Error fetching clients:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les clients",
+        title: "Erreur lors de la récupération des clients",
+        description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+    } else {
+      setClients(data || []);
     }
-  };
+    setLoading(false);
+  }, [toast]);
 
-  // Créer un nouveau client
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
+
   const createClient = async (clientData: ClientInsert) => {
-    if (!user) return null;
+    const { data, error } = await supabase
+      .from('clients')
+      .insert(clientData)
+      .select()
+      .single();
 
-    try {
-      const { data, error } = await supabase
-        .from('clients')
-        .insert([{ ...clientData, user_id: user.id }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setClients(prev => [data, ...prev]);
-      toast({
-        title: "Succès",
-        description: "Client créé avec succès",
-      });
-      return data;
-    } catch (error) {
+    if (error) {
       console.error('Error creating client:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de créer le client",
+        title: "Erreur lors de la création du client",
+        description: error.message,
         variant: "destructive",
       });
+      return null;
+    } else {
+      if (data) {
+        setClients(prevClients => [data, ...prevClients]);
+        toast({
+          title: "Client créé",
+          description: "Le nouveau client a été ajouté avec succès.",
+        });
+        return data;
+      }
       return null;
     }
   };
 
-  // Mettre à jour un client
   const updateClient = async (clientData: ClientUpdate) => {
+    if (!user) return null;
     try {
       const { data, error } = await supabase
         .from('clients')
         .update(clientData)
         .eq('id', clientData.id)
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .select()
         .single();
 
@@ -98,14 +94,14 @@ export function useClients() {
     }
   };
 
-  // Supprimer un client
   const deleteClient = async (clientId: string) => {
+    if (!user) return false;
     try {
       const { error } = await supabase
         .from('clients')
         .delete()
         .eq('id', clientId)
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
@@ -126,16 +122,5 @@ export function useClients() {
     }
   };
 
-  useEffect(() => {
-    fetchClients();
-  }, [user]);
-
-  return {
-    clients,
-    loading,
-    createClient,
-    updateClient,
-    deleteClient,
-    refetch: fetchClients
-  };
+  return { clients, loading, createClient, updateClient, deleteClient, fetchClients };
 }

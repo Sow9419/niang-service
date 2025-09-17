@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PlusCircle, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import type { ConducteurInsert } from '@/types';
+import type { Conducteur, ConducteurInsert, ConducteurUpdate } from '@/types';
 
 const formSchema = z.object({
   name: z.string().nonempty("Le nom est requis"),
@@ -21,11 +21,15 @@ const formSchema = z.object({
 
 interface AddNewConducteurProps {
   createConducteur: (data: ConducteurInsert) => Promise<any>;
+  updateConducteur: (data: ConducteurUpdate) => Promise<any>;
+  conducteurToEdit?: Conducteur | null;
+  onFinished: () => void;
 }
 
-const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur }) => {
+const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, updateConducteur, conducteurToEdit, onFinished }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
+  const isEditMode = !!conducteurToEdit;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,6 +40,17 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur })
     },
   });
 
+  useEffect(() => {
+    if (conducteurToEdit) {
+      form.reset(conducteurToEdit);
+      setAvatarPreview(conducteurToEdit.avatar_url || null);
+      setIsOpen(true);
+    } else {
+      form.reset();
+      setAvatarPreview(null);
+    }
+  }, [conducteurToEdit, form]);
+
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -45,7 +60,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur })
   };
 
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
-    let avatarUrl: string | undefined = undefined;
+    let avatarUrl: string | undefined = conducteurToEdit?.avatar_url;
 
     if (values.avatar) {
       const file = values.avatar;
@@ -56,7 +71,6 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur })
 
       if (error) {
         console.error("Error uploading avatar:", error);
-        // Handle error (e.g., show a toast)
         return;
       }
 
@@ -64,17 +78,15 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur })
       avatarUrl = publicUrl;
     }
 
-    const success = await createConducteur({
-      name: values.name,
-      phone: values.phone,
-      status: values.status,
-      avatar_url: avatarUrl,
-    });
+    const success = isEditMode
+      ? await updateConducteur({ id: conducteurToEdit.id, name: values.name, phone: values.phone, status: values.status, avatar_url: avatarUrl })
+      : await createConducteur({ name: values.name, phone: values.phone, status: values.status, avatar_url: avatarUrl });
 
     if (success) {
       form.reset();
       setAvatarPreview(null);
       setIsOpen(false);
+      onFinished();
     }
   };
 
@@ -88,7 +100,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur })
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Ajouter un nouveau conducteur</SheetTitle>
+          <SheetTitle>{isEditMode ? 'Modifier le conducteur' : 'Ajouter un nouveau conducteur'}</SheetTitle>
         </SheetHeader>
         <div className="py-4">
           <Form {...form}>
@@ -169,7 +181,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur })
                   Annuler
                 </Button>
                 <Button type="submit">
-                  Enregistrer
+                  {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
                 </Button>
               </div>
             </form>

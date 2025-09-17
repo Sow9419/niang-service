@@ -10,7 +10,7 @@ import type { Client, Commande, CommandeInsert } from '@/types';
 
 const formSchema = z.object({
   client_id: z.string().nonempty("Le client est requis"),
-  product_type: z.enum(['Essence', 'Gasoil']),
+  product: z.enum(['Essence', 'Gasoil']),
   quantity: z.number().min(1, "La quantité doit être supérieure à 0"),
   unit_price: z.number().min(1, "Le prix unitaire doit être supérieur à 0"),
   status: z.enum(['Non Livré', 'Livré', 'Annulée']),
@@ -30,7 +30,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
     resolver: zodResolver(formSchema),
     defaultValues: {
       client_id: '',
-      product_type: 'Gasoil',
+      product: 'Gasoil',
       quantity: 5000,
       unit_price: 850,
       status: 'Non Livré',
@@ -41,7 +41,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
     if (commande) {
       form.reset({
         client_id: commande.client_id.toString(),
-        product_type: commande.product_type,
+        product: commande.product,
         quantity: commande.quantity,
         unit_price: commande.unit_price,
         status: commande.status,
@@ -58,6 +58,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
     onSubmit({
       ...values,
       estimated_amount: estimatedAmount,
+      order_date: new Date().toISOString().split('T')[0],
     });
   };
 
@@ -95,7 +96,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
             />
             <FormField
               control={form.control}
-              name="product_type"
+              name="product"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type de produit</FormLabel>

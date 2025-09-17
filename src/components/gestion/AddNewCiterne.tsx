@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle } from 'lucide-react';
-import type { CiterneInsert } from '@/types';
+import { PlusCircle, Edit } from 'lucide-react';
+import type { Citerne, CiterneInsert, CiterneUpdate } from '@/types';
 
 const formSchema = z.object({
   registration: z.string().nonempty("L'immatriculation est requise"),
@@ -18,10 +18,15 @@ const formSchema = z.object({
 
 interface AddNewCiterneProps {
   createCiterne: (data: CiterneInsert) => Promise<any>;
+  updateCiterne: (data: CiterneUpdate) => Promise<any>;
+  citerneToEdit?: Citerne | null;
+  onFinished: () => void;
 }
 
-const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne }) => {
+const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCiterne, citerneToEdit, onFinished }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const isEditMode = !!citerneToEdit;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,11 +36,24 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne }) => {
     },
   });
 
+  useEffect(() => {
+    if (citerneToEdit) {
+      form.reset(citerneToEdit);
+      setIsOpen(true);
+    } else {
+      form.reset();
+    }
+  }, [citerneToEdit, form]);
+
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
-    const success = await createCiterne(values);
+    const success = isEditMode
+      ? await updateCiterne({ ...values, id: citerneToEdit.id })
+      : await createCiterne(values);
+
     if (success) {
       form.reset();
       setIsOpen(false);
+      onFinished();
     }
   };
 
@@ -49,7 +67,7 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne }) => {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Ajouter une nouvelle citerne</SheetTitle>
+          <SheetTitle>{isEditMode ? 'Modifier la citerne' : 'Ajouter une nouvelle citerne'}</SheetTitle>
         </SheetHeader>
         <div className="py-4">
           <Form {...form}>
@@ -107,7 +125,7 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne }) => {
                   Annuler
                 </Button>
                 <Button type="submit">
-                  Enregistrer
+                  {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
                 </Button>
               </div>
             </form>

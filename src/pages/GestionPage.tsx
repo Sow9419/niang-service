@@ -1,45 +1,73 @@
 
+import { useState } from "react";
 import { useCiternes } from "@/hooks/useCiternes";
 import { useConducteurs } from "@/hooks/useConducteurs";
+import { useClients } from "@/hooks/useClients";
 import TankerBoard from "@/components/gestion/TankerBoard";
 import DriverList from "@/components/gestion/DriverList";
-import { Skeleton } from "@/components/ui/skeleton";
+import ClientList from "@/components/gestion/ClientList";
 import AddNewCiterne from "@/components/gestion/AddNewCiterne";
 import AddNewConducteur from "@/components/gestion/AddNewConducteur";
+import AddNewClient from "@/components/gestion/AddNewClient";
+import type { Citerne, Conducteur, Client } from "@/types";
 
 export default function GestionPage() {
   const { citernes, loading: loadingCiternes, createCiterne, updateCiterne } = useCiternes();
-  const { conducteurs, loading: loadingConducteurs, createConducteur } = useConducteurs();
+  const { conducteurs, loading: loadingConducteurs, createConducteur, updateConducteur } = useConducteurs();
+  const { clients, loading: loadingClients, createClient, updateClient } = useClients();
 
-  const isLoading = loadingCiternes || loadingConducteurs;
+  const [editingCiterne, setEditingCiterne] = useState<Citerne | null>(null);
+  const [editingConducteur, setEditingConducteur] = useState<Conducteur | null>(null);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+
+  const isLoading = loadingCiternes || loadingConducteurs || loadingClients;
+
+  const handleEditCiterne = (citerne: Citerne) => {
+    setEditingCiterne(citerne);
+  };
+
+  const handleEditConducteur = (conducteur: Conducteur) => {
+    setEditingConducteur(conducteur);
+  };
+
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+  };
+
+  const onFinished = () => {
+    setEditingCiterne(null);
+    setEditingConducteur(null);
+    setEditingClient(null);
+  };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Gestion & Logistique</h1>
-        <p className="text-muted-foreground">Gérez vos citernes et conducteurs en un seul endroit.</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold">Gestion & Logistique</h1>
+          <p className="text-muted-foreground">Gérez vos citernes, conducteurs et clients en un seul endroit.</p>
+        </div>
+        <div className="flex space-x-4">
+          <AddNewClient createClient={createClient} updateClient={updateClient} clientToEdit={editingClient} onFinished={onFinished} />
+          <AddNewConducteur createConducteur={createConducteur} updateConducteur={updateConducteur} conducteurToEdit={editingConducteur} onFinished={onFinished} />
+          <AddNewCiterne createCiterne={createCiterne} updateCiterne={updateCiterne} citerneToEdit={editingCiterne} onFinished={onFinished} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <div className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Flotte de Citernes</h2>
-            <AddNewCiterne createCiterne={createCiterne} />
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
+        <div className="lg:col-span-1">
+          <DriverList drivers={conducteurs} isLoading={isLoading} onEdit={handleEditConducteur} />
+        </div>
+        <div className="lg:col-span-1">
+          <ClientList clients={clients} isLoading={isLoading} onEdit={handleEditClient} />
+        </div>
+        <div className="lg:col-span-1">
           <TankerBoard
             tankers={citernes}
             drivers={conducteurs}
             onUpdateTanker={updateCiterne}
             isLoading={isLoading}
           />
-        </div>
-
-        <div className="lg:col-span-1">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Équipe de Conducteurs</h2>
-            <AddNewConducteur createConducteur={createConducteur} />
-          </div>
-          <DriverList drivers={conducteurs} isLoading={isLoading} />
         </div>
       </div>
     </div>

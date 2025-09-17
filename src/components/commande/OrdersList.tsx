@@ -19,7 +19,7 @@ const OrderCard: React.FC<{ commande: Commande; onEdit: (commande: Commande) => 
         <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm text-left border-t border-b py-3 my-3">
             <div>
                 <p className="text-gray-500">Produit</p>
-                <p className="font-medium text-gray-800">{commande.product_type}</p>
+                <p className="font-medium text-gray-800">{commande.product}</p>
             </div>
             <div>
                 <p className="text-gray-500">Quantité</p>
@@ -167,7 +167,7 @@ const OrdersList: React.FC<OrdersListProps> = ({ commandes, onEdit, onDelete, is
                             <tr key={commande.id} className="bg-white border-b hover:bg-gray-50">
                                 <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{commande.order_number}</td>
                                 <td className="px-4 py-4">{commande.clients.name}</td>
-                                <td className="px-4 py-4">{commande.product_type}</td>
+                                <td className="px-4 py-4">{commande.product}</td>
                                 <td className="px-4 py-4">{commande.quantity.toLocaleString('fr-FR')}</td>
                                 <td className="px-4 py-4">{commande.unit_price.toLocaleString('fr-FR')}</td>
                                 <td className="px-4 py-4">{commande.estimated_amount.toLocaleString('fr-FR')}</td>
