@@ -179,43 +179,43 @@ export type Database = {
       }
       livraisons: {
         Row: {
-          citerne_id: string
+          citerne_id: string | null
           commande_id: number
           created_at: string
-          date_livraison: string
+          date_livraison: string | null
           id: number
           payment_status: Database["public"]["Enums"]["statut_paiement"]
           status: Database["public"]["Enums"]["statut_commun"]
           updated_at: string
           user_id: string | null
-          volume_livre: number
-          volume_manquant: number
+          volume_livre: number | null
+          volume_manquant: number | null
         }
         Insert: {
-          citerne_id: string
+          citerne_id?: string | null
           commande_id: number
           created_at?: string
-          date_livraison: string
+          date_livraison?: string | null
           id?: number
           payment_status?: Database["public"]["Enums"]["statut_paiement"]
           status?: Database["public"]["Enums"]["statut_commun"]
           updated_at?: string
           user_id?: string | null
-          volume_livre: number
-          volume_manquant: number
+          volume_livre?: number | null
+          volume_manquant?: number | null
         }
         Update: {
-          citerne_id?: string
+          citerne_id?: string | null
           commande_id?: number
           created_at?: string
-          date_livraison?: string
+          date_livraison?: string | null
           id?: number
           payment_status?: Database["public"]["Enums"]["statut_paiement"]
           status?: Database["public"]["Enums"]["statut_commun"]
           updated_at?: string
           user_id?: string | null
-          volume_livre?: number
-          volume_manquant?: number
+          volume_livre?: number | null
+          volume_manquant?: number | null
         }
         Relationships: [
           {
