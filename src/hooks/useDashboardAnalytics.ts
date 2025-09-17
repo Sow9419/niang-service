@@ -94,14 +94,50 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
                 if (livraisonsRes.error) throw livraisonsRes.error;
                 setLivraisonsRecentes(livraisonsRes.data as LivraisonRecente[]);
 
+                // Calculer le volume manquant total
+                const totalVolumeCommande = await supabase
+                    .from('commandes')
+                    .select('quantity')
+                    .gte('created_at', start);
+                
+                const totalCommandeVolume = totalVolumeCommande.data?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+                const volumeManquant = Math.max(0, totalCommandeVolume - currentVolume);
+
                 setDonutChartData([
                     { name: 'Volume livré', value: currentVolume },
-                    { name: 'Volume manquant', value: 12000 },
+                    { name: 'Volume manquant', value: volumeManquant },
                 ]);
-                setBarChartData([
-                    { name: 'Lun', value: 4000 }, { name: 'Mar', value: 3000 }, { name: 'Mer', value: 6000 }, 
-                    { name: 'Jeu', value: 8000 }, { name: 'Ven', value: 5500 }, { name: 'Sam', value: 7000 }, { name: 'Dim', value: 9000 },
-                ]);
+
+                // Données pour le graphique en barres (chiffre d'affaires par jour de la semaine)
+                const dailyRevenueData = [];
+                const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+                
+                for (let i = 0; i < 7; i++) {
+                    const dayStart = new Date();
+                    dayStart.setDate(dayStart.getDate() - (6 - i));
+                    dayStart.setHours(0, 0, 0, 0);
+                    
+                    const dayEnd = new Date(dayStart);
+                    dayEnd.setHours(23, 59, 59, 999);
+
+                    const dayRevenue = await supabase
+                        .from('livraisons')
+                        .select('commandes!inner(estimated_amount)')
+                        .eq('status', 'Livré')
+                        .gte('date_livraison', dayStart.toISOString().split('T')[0])
+                        .lte('date_livraison', dayEnd.toISOString().split('T')[0]);
+
+                    const revenue = dayRevenue.data?.reduce((sum: number, item: any) => {
+                        return sum + (item.commandes?.estimated_amount || 0);
+                    }, 0) || 0;
+
+                    dailyRevenueData.push({
+                        name: days[dayStart.getDay()],
+                        value: revenue
+                    });
+                }
+
+                setBarChartData(dailyRevenueData);
 
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
