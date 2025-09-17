@@ -10,7 +10,7 @@ import type { Livraison, Commande, Citerne, LivraisonUpdate } from '@/types';
 
 const formSchema = z.object({
   commande_id: z.number().positive("La commande est requise"),
-  citerne_id: z.number().positive("La citerne est requise"),
+  citerne_id: z.string().uuid("La citerne est requise").optional().nullable(),
   volume_manquant: z.number().min(0, "Le volume manquant ne peut pas être négatif"),
   date_livraison: z.string().nonempty("La date de livraison est requise"),
   status: z.enum(['Non Livré', 'Livré', 'Annulée']),
@@ -49,9 +49,9 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
     if (deliveryData) {
       form.reset({
         commande_id: deliveryData.commande_id,
-        citerne_id: deliveryData.citerne_id as any,
-        volume_manquant: deliveryData.volume_manquant,
-        date_livraison: new Date(deliveryData.date_livraison).toISOString().split('T')[0],
+        citerne_id: deliveryData.citerne_id || null,
+        volume_manquant: deliveryData.volume_manquant || 0,
+        date_livraison: deliveryData.date_livraison ? new Date(deliveryData.date_livraison).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         status: deliveryData.status,
         payment_status: deliveryData.payment_status,
       });
@@ -108,20 +108,20 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Citerne utilisée</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value?.toString()}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner une citerne" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {citernes.map((citerne) => (
-                        <SelectItem key={citerne.id} value={citerne.id.toString()}>
-                          {citerne.registration}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                   <Select onValueChange={field.onChange} value={field.value || ""}>
+                     <FormControl>
+                       <SelectTrigger>
+                         <SelectValue placeholder="Sélectionner une citerne" />
+                       </SelectTrigger>
+                     </FormControl>
+                     <SelectContent>
+                       {citernes.map((citerne) => (
+                         <SelectItem key={citerne.id} value={citerne.id}>
+                           {citerne.registration}
+                         </SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
