@@ -165,12 +165,12 @@ const OrdersList: React.FC<OrdersListProps> = ({ commandes, onEdit, onDelete, is
                         placeholder="Rechercher par client, com..."
                         value={searchTerm}
                         onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                        className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full sm:w-64 pl-10 pr-4 py-2 border text-gray-900 border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
                     />
                 </div>
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full sm:w-48 justify-between">
+                        <Button variant="outline" className="w-full sm:w-48 justify-between text-gray-900">
                             {statusFilter === 'Tous' ? 'Filtrer par statut' : statusFilter}
                             <ChevronDown className="w-4 h-4" />
                         </Button>

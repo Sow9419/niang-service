@@ -4,8 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle } from 'lucide-react';
 import type { Client, ClientInsert, ClientUpdate } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +46,13 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
       form.reset(clientToEdit);
       setIsOpen(true);
     } else {
-      form.reset();
+      form.reset({
+        name: '',
+        phone: '',
+        address: '',
+        contact_person: '',
+        email: '',
+      });
     }
   }, [clientToEdit, form]);
 
@@ -65,91 +72,100 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button>
+        <Button className='bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg'>
           <PlusCircle className="mr-2 h-4 w-4" />
           Ajouter un Client
         </Button>
       </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
+      <SheetContent className="flex flex-col w-full sm:max-w-lg h-full p-0">
+        <SheetHeader className="px-6 pt-6">
           <SheetTitle>{isEditMode ? 'Modifier le client' : 'Ajouter un nouveau client'}</SheetTitle>
+          <SheetDescription>
+            {isEditMode ? "Modifiez les informations du client ci-dessous." : "Remplissez les informations du nouveau client."}
+          </SheetDescription>
         </SheetHeader>
-        <div className="py-4">
+        <div className="flex-grow overflow-y-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom complet</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Jean Dupont" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contact_person"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Personne à contacter</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Jane Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: email@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Téléphone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: +221 77 123 45 67" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Adresse</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: 123, Rue de Dakar" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex justify-end space-x-4">
-                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                  Annuler
-                </Button>
-                <Button type="submit">
-                  {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
-                </Button>
-              </div>
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col h-full">
+              <ScrollArea className="flex-grow px-6">
+                <div className="py-4 space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom complet</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Jean Dupont" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contact_person"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Personne à contacter</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Jane Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: email@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Téléphone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: +221 77 123 45 67" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Adresse</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: 123, Rue de Dakar" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </ScrollArea>
+              <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
+                <div className="flex justify-end space-x-4 w-full">
+                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                    Annuler
+                  </Button>
+                  <Button type="submit">
+                    {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
+                  </Button>
+                </div>
+              </SheetFooter>
             </form>
           </Form>
         </div>

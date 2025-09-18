@@ -217,12 +217,12 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                         placeholder="Rechercher par client, com..."
                         value={searchTerm}
                         onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                        className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full sm:w-64 pl-10 pr-4 py-2 text-gray-900 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
                     />
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full sm:w-48 justify-between">
+                        <Button variant="outline" className="w-full sm:w-48 justify-between text-gray-900">
                             {statusFilter === 'Tous' ? 'Filtrer par statut' : statusFilter}
                             <ChevronDown className="w-4 h-4" />
                         </Button>
@@ -287,7 +287,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                                         <td className="px-4 py-4">{livraison.commandes?.clients?.name}</td>
                                         <td className="px-4 py-4 font-medium text-gray-800">{livraison.commandes?.quantity?.toLocaleString('fr-FR')} L</td>
                                         <td className="px-4 py-4">{livraison.volume_livre?.toLocaleString('fr-FR')} L</td>
-                                        <td className="px-4 py-4 font-semibold text-gray-900">{totalAmount.toLocaleString('fr-FR')} FCFA</td>
+                                        <td className="px-4 py-4 font-semibold text-gray-900">{livraison.montant_total?.toLocaleString('fr-FR')} FCFA</td>
                                         <td className={`px-4 py-4 font-medium ${livraison.volume_manquant > 0 ? 'text-red-600' : ''}`}>{livraison.volume_manquant?.toLocaleString('fr-FR')} L</td>
                                         <td className="px-4 py-4">{livraison.citernes?.registration || 'N/A'}</td>
                                         <td className="px-4 py-4">{livraison.date_livraison ? new Date(livraison.date_livraison).toLocaleDateString('fr-FR') : 'N/D'}</td>

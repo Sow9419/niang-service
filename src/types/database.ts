@@ -64,6 +64,7 @@ export interface Livraison {
   citerne_id?: string | null;
   volume_livre: number;
   volume_manquant: number;
+  montant_total: number;
   date_livraison?: string | null;
   status: StatutCommun;
   payment_status: StatutPaiement;

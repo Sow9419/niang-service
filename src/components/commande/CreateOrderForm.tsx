@@ -76,10 +76,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Client associé</FormLabel>
+                  <FormLabel className='text-gray-700'>Client associé</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className='text-gray-900'>
                         <SelectValue placeholder="Sélectionner un client" />
                       </SelectTrigger>
                     </FormControl>
@@ -100,10 +100,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
               name="product"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type de produit</FormLabel>
+                  <FormLabel className='text-gray-700'>Type de produit</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className='text-gray-900'>
                         <SelectValue placeholder="Sélectionner un produit" />
                       </SelectTrigger>
                     </FormControl>
@@ -121,8 +121,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
               name="quantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Quantité commandée (L)</FormLabel>
-                  <FormControl>
+                  <FormLabel className='text-gray-700'>Quantité commandée (L)</FormLabel>
+                  <FormControl className='text-gray-900'>
                     <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
                   </FormControl>
                   <FormMessage />
@@ -134,8 +134,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
               name="unit_price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prix unitaire (FCFA/L)</FormLabel>
-                  <FormControl>
+                  <FormLabel className='text-gray-700'>Prix unitaire (FCFA/L)</FormLabel>
+                  <FormControl className='text-gray-900'>
                     <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
                   </FormControl>
                   <FormMessage />
@@ -143,18 +143,18 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
               )}
             />
              <div>
-                <FormLabel>Montant estimé (FCFA)</FormLabel>
-                <Input value={estimatedAmount.toLocaleString('fr-FR')} disabled className="bg-gray-100 mt-2" />
+                <FormLabel className='text-gray-700'>Montant estimé (FCFA)</FormLabel>
+                <Input value={estimatedAmount.toLocaleString('fr-FR')} disabled className="bg-gray-100 mt-2 text-gray-900" />
             </div>
             <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Statut de la commande</FormLabel>
+                  <FormLabel className='text-gray-700'>Statut de la commande</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className='text-gray-900'>
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
                     </FormControl>
@@ -170,7 +170,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
             />
           </div>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" className='text-gray-900 bg-white border border-gray-300' onClick={onClose}>
               Annuler
             </Button>
             <Button type="submit">

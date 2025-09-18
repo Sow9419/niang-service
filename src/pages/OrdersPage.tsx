@@ -43,7 +43,7 @@ export default function OrdersPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Gestion des Commandes</h1>
+        <h1 className="text-3xl font-bold text-black">Gestion des Commandes</h1>
         {!isFormVisible && (
           <Button onClick={handleShowCreateForm}>
             <PlusCircle className="mr-2 h-4 w-4" />

@@ -42,15 +42,15 @@ export default function GestionPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start bg-white pt-4 px-4 pb-2 rounded-lg shadow-sm">
         <div>
-          <h1 className="text-3xl font-bold">Gestion & Logistique</h1>
-          <p className="text-muted-foreground">Gérez vos citernes, conducteurs et clients en un seul endroit.</p>
+          <h1 className="text-3xl font-bold text-black">Gestion & Logistique</h1>
+          <p className=" text-black/80">Gérez vos citernes, conducteurs et clients en un seul endroit.</p>
         </div>
         <div className="flex space-x-4">
-          <AddNewClient createClient={createClient} updateClient={updateClient} clientToEdit={editingClient} onFinished={onFinished} />
+          <AddNewClient createClient={createClient} updateClient={updateClient} clientToEdit={editingClient} onFinished={onFinished}/>
           <AddNewConducteur createConducteur={createConducteur} updateConducteur={updateConducteur} conducteurToEdit={editingConducteur} onFinished={onFinished} />
-          <AddNewCiterne createCiterne={createCiterne} updateCiterne={updateCiterne} citerneToEdit={editingCiterne} onFinished={onFinished} />
+          <AddNewCiterne createCiterne={createCiterne} updateCiterne={updateCiterne} citerneToEdit={editingCiterne} onFinished={onFinished} drivers={conducteurs} />
         </div>
       </div>
 
@@ -65,7 +65,6 @@ export default function GestionPage() {
           <TankerBoard
             tankers={citernes}
             drivers={conducteurs}
-            onUpdateTanker={updateCiterne}
             isLoading={isLoading}
           />
         </div>

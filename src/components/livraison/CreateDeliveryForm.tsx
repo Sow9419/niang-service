@@ -76,14 +76,14 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               name="commande_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Commande associée</FormLabel>
+                  <FormLabel className='text-gray-700'>Commande associée</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value?.toString()} disabled={isEditMode}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className='text-black'>
                         <SelectValue placeholder="Sélectionner une commande" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent >
                       {commandes.map((commande) => (
                         <SelectItem key={commande.id} value={commande.id.toString()}>
                           {`${commande.order_number} - ${commande.clients.name}`}
@@ -96,11 +96,11 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               )}
             />
             <FormItem>
-              <FormLabel>Client</FormLabel>
+              <FormLabel className='text-gray-700'>Client</FormLabel>
               <Input value={selectedCommande?.clients.name || ''} disabled className="bg-gray-100" />
             </FormItem>
             <FormItem>
-              <FormLabel>Quantité commandée (L)</FormLabel>
+              <FormLabel className='text-gray-700'>Quantité commandée (L)</FormLabel>
               <Input value={selectedCommande?.quantity.toLocaleString('fr-FR') || ''} disabled className="bg-gray-100" />
             </FormItem>
             <FormField
@@ -108,10 +108,10 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               name="citerne_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Citerne utilisée</FormLabel>
+                  <FormLabel className='text-gray-700'>Citerne utilisée</FormLabel>
                    <Select onValueChange={field.onChange} value={field.value || ""}>
                      <FormControl>
-                       <SelectTrigger>
+                       <SelectTrigger className='text-black'>
                          <SelectValue placeholder="Sélectionner une citerne" />
                        </SelectTrigger>
                      </FormControl>
@@ -132,7 +132,7 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               name="volume_manquant"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Volume manquant (L)</FormLabel>
+                  <FormLabel className='text-gray-700'>Volume manquant (L)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
                   </FormControl>
@@ -141,11 +141,11 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               )}
             />
             <FormItem>
-              <FormLabel>Volume livré (L)</FormLabel>
+              <FormLabel className='text-gray-700'>Volume livré (L)</FormLabel>
               <Input value={volumeLivre.toLocaleString('fr-FR')} disabled className="bg-gray-100" />
             </FormItem>
             <FormItem>
-              <FormLabel>Montant Total (FCFA)</FormLabel>
+              <FormLabel className='text-gray-700'>Montant Total (FCFA)</FormLabel>
               <Input value={montantTotal.toLocaleString('fr-FR')} disabled className="bg-gray-100" />
             </FormItem>
             <FormField
@@ -168,10 +168,10 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Statut de la livraison</FormLabel>
+                  <FormLabel className='text-gray-700'>Statut de la livraison</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className='text-black'>
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
                     </FormControl>
@@ -190,10 +190,10 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
               name="payment_status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Statut du paiement</FormLabel>
+                  <FormLabel className='text-gray-700'>Statut du paiement</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className='text-black'>
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
                     </FormControl>
@@ -208,7 +208,7 @@ const CreateDeliveryForm: React.FC<CreateDeliveryFormProps> = ({ onClose, onSubm
             />
           </div>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" className='bg-white border border-gray-300 text-gray-700' onClick={onClose}>
               Annuler
             </Button>
             <Button type="submit">

@@ -5,8 +5,9 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PlusCircle, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +47,11 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
       setAvatarPreview(conducteurToEdit.avatar_url || null);
       setIsOpen(true);
     } else {
-      form.reset();
+      form.reset({
+        name: '',
+        phone: '',
+        status: 'available',
+      });
       setAvatarPreview(null);
     }
   }, [conducteurToEdit, form]);
@@ -93,97 +98,106 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button>
+        <Button className='bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-full shadow-lg border border-yellow-200'>
           <PlusCircle className="mr-2 h-4 w-4" />
           Ajouter un Conducteur
         </Button>
       </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
+      <SheetContent className="flex flex-col w-full sm:max-w-lg h-full p-0">
+        <SheetHeader className="px-6 pt-6">
           <SheetTitle>{isEditMode ? 'Modifier le conducteur' : 'Ajouter un nouveau conducteur'}</SheetTitle>
+          <SheetDescription>
+            {isEditMode ? "Modifiez les informations du conducteur." : "Remplissez les informations du nouveau conducteur."}
+          </SheetDescription>
         </SheetHeader>
-        <div className="py-4">
+        <div className="flex-grow overflow-y-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-              <div className="flex flex-col items-center space-y-4">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={avatarPreview || undefined} />
-                  <AvatarFallback>
-                    <User className="h-12 w-12" />
-                  </AvatarFallback>
-                </Avatar>
-                <FormField
-                  control={form.control}
-                  name="avatar"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input id="avatar-upload" type="file" className="sr-only" onChange={handleAvatarChange} accept="image/*" />
-                      </FormControl>
-                      <Button asChild variant="outline">
-                        <label htmlFor="avatar-upload">Changer l'avatar</label>
-                      </Button>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom complet</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Jean Dupont" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Téléphone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: +221 77 123 45 67" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Statut</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un statut" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="available">Disponible</SelectItem>
-                        <SelectItem value="on_delivery">En livraison</SelectItem>
-                        <SelectItem value="maintenance">En maintenance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex justify-end space-x-4">
-                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                  Annuler
-                </Button>
-                <Button type="submit">
-                  {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
-                </Button>
-              </div>
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col h-full">
+              <ScrollArea className="flex-grow px-6">
+                <div className="py-4 space-y-6">
+                  <div className="flex flex-col items-center space-y-4">
+                    <Avatar className="h-24 w-24">
+                      <AvatarImage src={avatarPreview || undefined} />
+                      <AvatarFallback>
+                        <User className="h-12 w-12" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <FormField
+                      control={form.control}
+                      name="avatar"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input id="avatar-upload" type="file" className="sr-only" onChange={handleAvatarChange} accept="image/*" />
+                          </FormControl>
+                          <Button asChild variant="outline">
+                            <label htmlFor="avatar-upload">Changer l'avatar</label>
+                          </Button>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom complet</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Jean Dupont" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Téléphone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: +221 77 123 45 67" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Statut</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Sélectionner un statut" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="available">Disponible</SelectItem>
+                            <SelectItem value="on_delivery">En livraison</SelectItem>
+                            <SelectItem value="maintenance">En maintenance</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </ScrollArea>
+              <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
+                <div className="flex justify-end space-x-4 w-full">
+                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                    Annuler
+                  </Button>
+                  <Button type="submit">
+                    {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
+                  </Button>
+                </div>
+              </SheetFooter>
             </form>
           </Form>
         </div>

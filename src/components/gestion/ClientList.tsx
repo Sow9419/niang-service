@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 
 const ClientCard: React.FC<{ client: Client; onEdit: (client: Client) => void; }> = ({ client, onEdit }) => (
-    <div className="flex items-center justify-between p-3">
+    <div className="flex items-center justify-between p-3 bg-zinc-100 rounded-lg">
         <div className="flex items-center gap-4">
             <Avatar className="h-10 w-10">
                 <AvatarFallback>
@@ -20,8 +20,8 @@ const ClientCard: React.FC<{ client: Client; onEdit: (client: Client) => void; }
                 <p className="text-sm text-muted-foreground">{client.phone}</p>
             </div>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => onEdit(client)}>
-            <Edit className="h-4 w-4" />
+        <Button className='rounded-full bg-white' size="icon" onClick={() => onEdit(client)}>
+            <Edit className="h-4 w-4 text-black" />
         </Button>
     </div>
 );
@@ -30,7 +30,7 @@ const ClientCard: React.FC<{ client: Client; onEdit: (client: Client) => void; }
 const ClientList: React.FC<{ clients: Client[], isLoading: boolean, onEdit: (client: Client) => void; }> = ({ clients, isLoading, onEdit }) => {
     if (isLoading) {
         return (
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white shadow-sm border-none w-auto">
                 <CardHeader>
                     <Skeleton className="h-8 w-40 bg-gray-200" />
                 </CardHeader>
@@ -50,9 +50,9 @@ const ClientList: React.FC<{ clients: Client[], isLoading: boolean, onEdit: (cli
     }
 
     return (
-        <Card className="bg-white shadow-sm w-auto">
+        <Card className="bg-white shadow-sm w-auto border-none">
             <CardHeader>
-                <CardTitle>Clients</CardTitle>
+                <CardTitle className='text-black'>Clients</CardTitle>
             </CardHeader>
             <ScrollArea className="h-[320px]">
                 <CardContent className="divide-y">
@@ -62,8 +62,8 @@ const ClientList: React.FC<{ clients: Client[], isLoading: boolean, onEdit: (cli
                         ))
                     ) : (
                         <div className="text-center py-12">
-                            <h3 className="text-lg font-semibold">Aucun client trouvé</h3>
-                            <p className="text-muted-foreground mt-1 text-sm">Commencez par ajouter un nouveau client.</p>
+                            <h3 className="text-lg font-semibold text-black">Aucun client trouvé</h3>
+                            <p className="text-gray-800 mt-1 text-sm">Commencez par ajouter un nouveau client.</p>
                         </div>
                     )}
                 </CardContent>

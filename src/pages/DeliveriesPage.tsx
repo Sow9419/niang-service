@@ -43,7 +43,7 @@ export default function DeliveriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Suivi des Livraisons</h1>
+        <h1 className="text-3xl font-bold text-black">Suivi des Livraisons</h1>
       </div>
 
       {isFormVisible && (
