@@ -30,14 +30,16 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
   const [isOpen, setIsOpen] = React.useState(false);
   const isEditMode = !!citerneToEdit;
 
+  const defaultValues = {
+    registration: '',
+    capacity_liters: 10000,
+    status: 'Disponible' as const,
+    assigned_driver_id: null,
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      registration: '',
-      capacity_liters: 10000,
-      status: 'Disponible',
-      assigned_driver_id: null,
-    },
+    defaultValues,
   });
 
   useEffect(() => {
@@ -47,15 +49,25 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
         assigned_driver_id: citerneToEdit.assigned_driver_id || null,
       });
       setIsOpen(true);
-    } else {
-      form.reset({
-        registration: '',
-        capacity_liters: 10000,
-        status: 'Disponible',
-        assigned_driver_id: null,
-      });
     }
   }, [citerneToEdit, form]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      // Reset form when closing
+      form.reset(defaultValues);
+      // Clear edit mode if we're not editing anymore
+      if (!citerneToEdit) {
+        onFinished();
+      }
+    }
+  };
+
+  const handleNewCiterne = () => {
+    form.reset(defaultValues);
+    setIsOpen(true);
+  };
 
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
     const data = {
@@ -75,9 +87,12 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button className='bg-orange-400 hover:bg-orange-500 text-white rounded-full shadow-lg' onClick={() => setIsOpen(true)}>
+        <Button 
+          className='bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-full shadow-lg' 
+          onClick={handleNewCiterne}
+        >
           <PlusCircle className="mr-2 h-4 w-4" />
           Ajouter une Citerne
         </Button>
@@ -171,7 +186,7 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                     Annuler
                   </Button>
                   <Button type="submit">

@@ -32,13 +32,15 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
   const isEditMode = !!conducteurToEdit;
 
+  const defaultValues = {
+    name: '',
+    phone: '',
+    status: 'available' as const,
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      phone: '',
-      status: 'available',
-    },
+    defaultValues,
   });
 
   useEffect(() => {
@@ -46,15 +48,27 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
       form.reset(conducteurToEdit);
       setAvatarPreview(conducteurToEdit.avatar_url || null);
       setIsOpen(true);
-    } else {
-      form.reset({
-        name: '',
-        phone: '',
-        status: 'available',
-      });
-      setAvatarPreview(null);
     }
   }, [conducteurToEdit, form]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      // Reset form and avatar when closing
+      form.reset(defaultValues);
+      setAvatarPreview(null);
+      // Clear edit mode if we're not editing anymore
+      if (!conducteurToEdit) {
+        onFinished();
+      }
+    }
+  };
+
+  const handleNewConducteur = () => {
+    form.reset(defaultValues);
+    setAvatarPreview(null);
+    setIsOpen(true);
+  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,9 +110,12 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button className='bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-full shadow-lg border border-yellow-200'>
+        <Button 
+          className='bg-accent hover:bg-accent/90 text-accent-foreground rounded-full shadow-lg'
+          onClick={handleNewConducteur}
+        >
           <PlusCircle className="mr-2 h-4 w-4" />
           Ajouter un Conducteur
         </Button>
@@ -190,7 +207,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                     Annuler
                   </Button>
                   <Button type="submit">

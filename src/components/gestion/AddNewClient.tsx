@@ -30,31 +30,42 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
   const [isOpen, setIsOpen] = React.useState(false);
   const isEditMode = !!clientToEdit;
 
+  const defaultValues = {
+    name: '',
+    phone: '',
+    address: '',
+    contact_person: '',
+    email: '',
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      phone: '',
-      address: '',
-      contact_person: '',
-      email: '',
-    },
+    defaultValues,
   });
 
   useEffect(() => {
     if (clientToEdit) {
       form.reset(clientToEdit);
       setIsOpen(true);
-    } else {
-      form.reset({
-        name: '',
-        phone: '',
-        address: '',
-        contact_person: '',
-        email: '',
-      });
     }
   }, [clientToEdit, form]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      // Reset form when closing
+      form.reset(defaultValues);
+      // Clear edit mode if we're not editing anymore
+      if (!clientToEdit) {
+        onFinished();
+      }
+    }
+  };
+
+  const handleNewClient = () => {
+    form.reset(defaultValues);
+    setIsOpen(true);
+  };
 
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -70,9 +81,12 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button className='bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg'>
+        <Button 
+          className='bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg'
+          onClick={handleNewClient}
+        >
           <PlusCircle className="mr-2 h-4 w-4" />
           Ajouter un Client
         </Button>
@@ -158,7 +172,7 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                     Annuler
                   </Button>
                   <Button type="submit">
