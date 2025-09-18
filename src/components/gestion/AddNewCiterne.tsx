@@ -60,7 +60,7 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
     const data = {
         ...values,
-        assigned_driver_id: values.assigned_driver_id === '' ? null : values.assigned_driver_id,
+        assigned_driver_id: values.assigned_driver_id === 'unassigned' || values.assigned_driver_id === '' ? null : values.assigned_driver_id,
     };
 
     const success = isEditMode
@@ -155,7 +155,7 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">Non assigné</SelectItem>
+                            <SelectItem value="unassigned">Non assigné</SelectItem>
                             {drivers.map(driver => (
                               <SelectItem key={driver.id} value={driver.id}>
                                 {driver.name}
