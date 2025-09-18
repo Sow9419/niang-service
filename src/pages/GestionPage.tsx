@@ -42,15 +42,17 @@ export default function GestionPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start bg-white pt-4 px-4 pb-2 rounded-lg shadow-sm">
-        <div>
-          <h1 className="text-3xl font-bold text-black">Gestion & Logistique</h1>
-          <p className=" text-black/80">Gérez vos citernes, conducteurs et clients en un seul endroit.</p>
-        </div>
-        <div className="flex space-x-4">
-          <AddNewClient createClient={createClient} updateClient={updateClient} clientToEdit={editingClient} onFinished={onFinished}/>
-          <AddNewConducteur createConducteur={createConducteur} updateConducteur={updateConducteur} conducteurToEdit={editingConducteur} onFinished={onFinished} />
-          <AddNewCiterne createCiterne={createCiterne} updateCiterne={updateCiterne} citerneToEdit={editingCiterne} onFinished={onFinished} drivers={conducteurs} />
+      <div className="bg-white pt-4 px-4 pb-2 rounded-lg shadow-sm">
+        <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-start lg:space-y-0">
+          <div className="flex-1">
+            <h1 className="text-2xl lg:text-3xl font-bold text-black">Gestion & Logistique</h1>
+            <p className="text-black/80 text-sm lg:text-base">Gérez vos citernes, conducteurs et clients en un seul endroit.</p>
+          </div>
+          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 lg:space-x-4">
+            <AddNewClient createClient={createClient} updateClient={updateClient} clientToEdit={editingClient} onFinished={onFinished}/>
+            <AddNewConducteur createConducteur={createConducteur} updateConducteur={updateConducteur} conducteurToEdit={editingConducteur} onFinished={onFinished} />
+            <AddNewCiterne createCiterne={createCiterne} updateCiterne={updateCiterne} citerneToEdit={editingCiterne} onFinished={onFinished} drivers={conducteurs} />
+          </div>
         </div>
       </div>
 
