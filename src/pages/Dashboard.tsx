@@ -93,7 +93,7 @@ export default function Dashboard() {
             {/* Charts */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2">
-                    <BarChartComponent data={barChartData} isLoading={isLoading} />
+                    <BarChartComponent data={barChartData} isLoading={isLoading} period={activeTab} />
                 </div>
                 <div className="lg:col-span-1">
                     <DonutChartComponent data={donutChartData} isLoading={isLoading} />

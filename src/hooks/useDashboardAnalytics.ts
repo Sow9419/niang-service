@@ -107,36 +107,99 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
                     { name: 'Volume manquant', value: volumeManquant },
                 ]);
 
-                // Données pour le graphique en barres (chiffre d'affaires par jour de la semaine)
-                const dailyRevenueData = [];
-                const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+                // Données pour le graphique en barres selon la période
+                let chartData = [];
                 
-                for (let i = 0; i < 7; i++) {
-                    const dayStart = new Date();
-                    dayStart.setDate(dayStart.getDate() - (6 - i));
-                    dayStart.setHours(0, 0, 0, 0);
+                if (period === 'Jour') {
+                    // Chiffre d'affaires par jour de la semaine (7 derniers jours)
+                    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
                     
-                    const dayEnd = new Date(dayStart);
-                    dayEnd.setHours(23, 59, 59, 999);
+                    for (let i = 0; i < 7; i++) {
+                        const dayStart = new Date();
+                        dayStart.setDate(dayStart.getDate() - (6 - i));
+                        dayStart.setHours(0, 0, 0, 0);
+                        
+                        const dayEnd = new Date(dayStart);
+                        dayEnd.setHours(23, 59, 59, 999);
 
-                    const dayRevenue = await supabase
-                        .from('livraisons')
-                        .select('montant_total')
-                        .eq('status', 'Livré')
-                        .gte('date_livraison', dayStart.toISOString().split('T')[0])
-                        .lte('date_livraison', dayEnd.toISOString().split('T')[0]);
+                        const dayRevenue = await supabase
+                            .from('livraisons')
+                            .select('montant_total')
+                            .eq('status', 'Livré')
+                            .gte('date_livraison', dayStart.toISOString().split('T')[0])
+                            .lte('date_livraison', dayEnd.toISOString().split('T')[0]);
 
-                    const revenue = dayRevenue.data?.reduce((sum: number, item: any) => {
-                        return sum + (item.montant_total || 0);
-                    }, 0) || 0;
+                        const revenue = dayRevenue.data?.reduce((sum: number, item: any) => {
+                            return sum + (item.montant_total || 0);
+                        }, 0) || 0;
 
-                    dailyRevenueData.push({
-                        name: days[dayStart.getDay()],
-                        value: revenue
-                    });
+                        chartData.push({
+                            name: days[dayStart.getDay()],
+                            value: revenue
+                        });
+                    }
+                } else if (period === 'Semaine') {
+                    // Chiffre d'affaires par semaine (4 dernières semaines)
+                    for (let i = 0; i < 4; i++) {
+                        const weekStart = new Date();
+                        const currentWeek = weekStart.getDay();
+                        weekStart.setDate(weekStart.getDate() - (currentWeek === 0 ? 6 : currentWeek - 1) - (i * 7));
+                        weekStart.setHours(0, 0, 0, 0);
+                        
+                        const weekEnd = new Date(weekStart);
+                        weekEnd.setDate(weekEnd.getDate() + 6);
+                        weekEnd.setHours(23, 59, 59, 999);
+
+                        const weekRevenue = await supabase
+                            .from('livraisons')
+                            .select('montant_total')
+                            .eq('status', 'Livré')
+                            .gte('date_livraison', weekStart.toISOString().split('T')[0])
+                            .lte('date_livraison', weekEnd.toISOString().split('T')[0]);
+
+                        const revenue = weekRevenue.data?.reduce((sum: number, item: any) => {
+                            return sum + (item.montant_total || 0);
+                        }, 0) || 0;
+
+                        chartData.unshift({
+                            name: `S${4 - i}`,
+                            value: revenue
+                        });
+                    }
+                } else if (period === 'Mois') {
+                    // Chiffre d'affaires par mois (12 derniers mois)
+                    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+                    
+                    for (let i = 0; i < 12; i++) {
+                        const monthStart = new Date();
+                        monthStart.setMonth(monthStart.getMonth() - (11 - i));
+                        monthStart.setDate(1);
+                        monthStart.setHours(0, 0, 0, 0);
+                        
+                        const monthEnd = new Date(monthStart);
+                        monthEnd.setMonth(monthEnd.getMonth() + 1);
+                        monthEnd.setDate(0);
+                        monthEnd.setHours(23, 59, 59, 999);
+
+                        const monthRevenue = await supabase
+                            .from('livraisons')
+                            .select('montant_total')
+                            .eq('status', 'Livré')
+                            .gte('date_livraison', monthStart.toISOString().split('T')[0])
+                            .lte('date_livraison', monthEnd.toISOString().split('T')[0]);
+
+                        const revenue = monthRevenue.data?.reduce((sum: number, item: any) => {
+                            return sum + (item.montant_total || 0);
+                        }, 0) || 0;
+
+                        chartData.push({
+                            name: months[monthStart.getMonth()],
+                            value: revenue
+                        });
+                    }
                 }
 
-                setBarChartData(dailyRevenueData);
+                setBarChartData(chartData);
 
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
