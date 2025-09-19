@@ -5,25 +5,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { Fuel, Truck, Users, BarChart3, Shield, Smartphone } from "lucide-react";
+import { Features } from "./ui/features";
+import { useNavigate } from "react-router-dom";
 
 export default function FuelHeader() {
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const navigator = useNavigate();
 
   return (
     <header className="relative z-20 flex items-center justify-between p-6">
       {/* Logo */}
       <div className="flex items-center">
-        <svg
-          fill="currentColor"
-          viewBox="0 0 147 70"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          className="size-10 translate-x-[-0.5px] text-white"
-        >
-          <path d="M56 50.2031V14H70V60.1562C70 65.5928 65.5928 70 60.1562 70C57.5605 70 54.9982 68.9992 53.1562 67.1573L0 14H19.7969L56 50.2031Z"></path>
-          <path d="M147 56H133V23.9531L100.953 56H133V70H96.6875C85.8144 70 77 61.1856 77 50.3125V14H91V46.1562L123.156 14H91V0H127.312C138.186 0 147 8.81439 147 19.6875V56Z"></path>
-        </svg>
+        <span className="text-2xl font-bold text-white">MAGICUX</span>
       </div>
 
       {/* Navigation */}
@@ -37,42 +31,11 @@ export default function FuelHeader() {
               Fonctionnalités
             </a>
           </DialogTrigger>
-          <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-3xl mb-4">Fonctionnalités Complètes</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <Fuel className="w-8 h-8 text-primary mb-4" />
-                <h3 className="font-semibold mb-2">Monitoring Citernes</h3>
-                <p className="text-sm text-muted-foreground">Surveillance en temps réel des niveaux, température et qualité du carburant.</p>
-              </div>
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <Truck className="w-8 h-8 text-secondary mb-4" />
-                <h3 className="font-semibold mb-2">Livraisons Optimisées</h3>
-                <p className="text-sm text-muted-foreground">Planification automatique et tracking GPS des livraisons d'essence et gasoil.</p>
-              </div>
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <Users className="w-8 h-8 text-accent mb-4" />
-                <h3 className="font-semibold mb-2">CRM Intégré</h3>
-                <p className="text-sm text-muted-foreground">Gestion complète de votre clientèle et historique des transactions.</p>
-              </div>
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <BarChart3 className="w-8 h-8 text-primary mb-4" />
-                <h3 className="font-semibold mb-2">Analytics Avancés</h3>
-                <p className="text-sm text-muted-foreground">Tableaux de bord détaillés et rapports d'activité en temps réel.</p>
-              </div>
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <Smartphone className="w-8 h-8 text-secondary mb-4" />
-                <h3 className="font-semibold mb-2">App Mobile</h3>
-                <p className="text-sm text-muted-foreground">Accès complet depuis votre smartphone ou tablette.</p>
-              </div>
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <Shield className="w-8 h-8 text-accent mb-4" />
-                <h3 className="font-semibold mb-2">Sécurité Avancée</h3>
-                <p className="text-sm text-muted-foreground">Chiffrement de bout en bout et conformité aux normes industrielles.</p>
-              </div>
-            </div>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white">
+            <DialogHeader className="relative bg-white p-0 flex items-baseline justify-center">
+                <DialogTitle className="text-2xl mb-0 text-black pl-8 pt-4">Fonctionnalités Complètes</DialogTitle>
+              </DialogHeader>
+            <Features/>
           </DialogContent>
         </Dialog>
 
@@ -85,26 +48,16 @@ export default function FuelHeader() {
               Tarifs
             </a>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-zinc-500">
             <DialogHeader>
               <DialogTitle className="text-3xl mb-4">Plans d'Abonnement</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                <h3 className="font-semibold text-xl mb-2">Starter</h3>
-                <div className="text-3xl font-bold text-primary mb-4">29CFA<span className="text-sm font-normal text-muted-foreground">/mois</span></div>
-                <ul className="space-y-2 mb-6">
-                  <li className="text-sm">✓ Jusqu'à 5 citernes</li>
-                  <li className="text-sm">✓ Monitoring basique</li>
-                  <li className="text-sm">✓ Support email</li>
-                  <li className="text-sm">✓ App mobile</li>
-                </ul>
-                <Button className="w-full">Commencer</Button>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
               <div className="p-6 border-2 border-primary rounded-lg relative">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs">Populaire</div>
                 <h3 className="font-semibold text-xl mb-2">Professionnel</h3>
-                <div className="text-3xl font-bold text-primary mb-4">89CFA<span className="text-sm font-normal text-muted-foreground">/mois</span></div>
+                <div className="text-3xl font-bold text-primary mb-4">100 000CFA<span className="text-sm font-normal text-white">/mois</span></div>
                 <ul className="space-y-2 mb-6">
                   <li className="text-sm">✓ Citernes illimitées</li>
                   <li className="text-sm">✓ Monitoring avancé</li>
@@ -112,9 +65,9 @@ export default function FuelHeader() {
                   <li className="text-sm">✓ Analytics avancés</li>
                   <li className="text-sm">✓ Support prioritaire</li>
                 </ul>
-                <Button className="w-full">Commencer</Button>
+                <Button onClick={() => navigator("/signup")} className="w-full">Commencer</Button>
               </div>
-              <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
+              <div className="p-6 border border-gray-400 rounded-lg hover:border-primary/50 transition-colors shadow-lg">
                 <h3 className="font-semibold text-xl mb-2">Enterprise</h3>
                 <div className="text-3xl font-bold text-primary mb-4">Sur mesure</div>
                 <ul className="space-y-2 mb-6">
@@ -124,18 +77,11 @@ export default function FuelHeader() {
                   <li className="text-sm">✓ Formation équipe</li>
                   <li className="text-sm">✓ SLA garanti</li>
                 </ul>
-                <Button variant="outline" className="w-full">Nous contacter</Button>
+                <Button onClick={() => window.open("https://wa.me/22394231914", "_blank")} variant="outline" className="w-full border border-gray-400">Nous contacter</Button>
               </div>
             </div>
           </DialogContent>
         </Dialog>
-
-        <a
-          href="#"
-          className="text-white/80 hover:text-white text-xs font-light px-3 py-2 rounded-full hover:bg-white/10 transition-all duration-200"
-        >
-          Docs
-        </a>
       </nav>
 
       {/* Login and Signup Buttons */}

@@ -42,12 +42,12 @@ export function useLivraisons() {
               phone
             )
           )
-        `)
+        `, { count: 'exact' })
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setLivraisons(data || []);
+      setLivraisons(data as any || []);
     } catch (error) {
       console.error('Error fetching livraisons:', error);
       toast({
@@ -68,11 +68,21 @@ export function useLivraisons() {
       // Calculer automatiquement le volume livré
       const volumeLivre = commandeQuantity - livraisonData.volume_manquant;
       
+      // Récupérer le prix unitaire de la commande pour calculer le montant total
+      const { data: commandeData } = await supabase
+        .from('commandes')
+        .select('unit_price')
+        .eq('id', livraisonData.commande_id)
+        .single();
+      
+      const montantTotal = volumeLivre * (commandeData?.unit_price || 0);
+      
       const { data, error } = await supabase
         .from('livraisons')
         .insert([{ 
           ...livraisonData, 
           volume_livre: volumeLivre,
+          montant_total: montantTotal,
           user_id: user.id 
         }])
         .select(`
@@ -110,7 +120,7 @@ export function useLivraisons() {
         .update({ status: data.status })
         .eq('id', data.commande_id);
 
-      setLivraisons(prev => [data, ...prev]);
+      setLivraisons(prev => [data as any, ...prev]);
       toast({
         title: "Succès",
         description: "Livraison créée avec succès",
@@ -179,7 +189,7 @@ export function useLivraisons() {
       }
 
       setLivraisons(prev => prev.map(livraison => 
-        livraison.id === livraisonData.id ? data : livraison
+        livraison.id === livraisonData.id ? data as any : livraison
       ));
       toast({
         title: "Succès",

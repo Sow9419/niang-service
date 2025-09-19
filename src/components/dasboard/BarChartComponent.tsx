@@ -2,13 +2,23 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { BarChartData } from '@/types';
+import { Period } from '@/hooks/useDashboardAnalytics';
 
 interface BarChartComponentProps {
     data: BarChartData;
     isLoading: boolean;
+    period: Period;
 }
 
-const BarChartComponent: React.FC<BarChartComponentProps> = ({ data, isLoading }) => {
+const BarChartComponent: React.FC<BarChartComponentProps> = ({ data, isLoading, period }) => {
+    const getPeriodLabel = () => {
+        switch (period) {
+            case 'Jour': return 'sur les 7 derniers jours';
+            case 'Semaine': return 'sur les 4 dernières semaines';
+            case 'Mois': return 'sur les 12 derniers mois';
+            default: return '';
+        }
+    };
     if (isLoading) {
         return (
             <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
@@ -24,7 +34,7 @@ const BarChartComponent: React.FC<BarChartComponentProps> = ({ data, isLoading }
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg text-gray-800">Évolution du chiffre d'affaires encaissé</h3>
+        <h3 className="font-semibold text-lg text-gray-800">Évolution du chiffre d'affaires encaissé {getPeriodLabel()}</h3>
       </div>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">

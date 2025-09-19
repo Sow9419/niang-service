@@ -48,14 +48,14 @@ export function LoginDialog({ children }: LoginDialogProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md glass-effect border-primary/20">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center gradient-text">
+          <DialogTitle className="text-2xl font-bold text-center text-black">
             Se connecter
           </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label className="text-gray-700" htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
@@ -63,12 +63,12 @@ export function LoginDialog({ children }: LoginDialogProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-background/50 border-primary/20 focus:border-primary"
+              className="bg-background/50 border-gray-400 focus:border-black"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label className="text-gray-700" htmlFor="password">Mot de passe</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -77,7 +77,7 @@ export function LoginDialog({ children }: LoginDialogProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-background/50 border-primary/20 focus:border-primary pr-10"
+                className="bg-background/50 border-gray-400 focus:border-black pr-10"
               />
               <Button
                 type="button"
@@ -117,14 +117,13 @@ export function LoginDialog({ children }: LoginDialogProps) {
             
             <Button
               type="button"
-              variant="ghost"
               size="sm"
               onClick={() => {
                 setOpen(false);
                 // Ouvrir la page de récupération
                 window.location.href = "/forgot-password";
               }}
-              className="text-primary hover:text-primary/80"
+              className="text-primary bg-transparent hover:bg-transparent hover:text-black"
             >
               Mot de passe oublié ?
             </Button>

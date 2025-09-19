@@ -65,14 +65,14 @@ const DonutChartComponent: React.FC<DonutChartComponentProps> = ({ data, isLoadi
                   <span className="w-3 h-3 rounded-full bg-blue-500"></span>
                   <span className="text-gray-500">Volume livré</span>
               </div>
-              <span className="font-semibold text-gray-800">{(data[0]?.value || 0).toLocaleString('fr-FR')} L</span>
+              <span className="font-semibold text-gray-800">{(data.find(d => d.name === 'Volume livré')?.value || 0).toLocaleString('fr-FR')} L</span>
           </div>
           <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-gray-200"></span>
                   <span className="text-gray-500">Volume manquant</span>
               </div>
-              <span className="font-semibold text-gray-800">{(data[1]?.value || 0).toLocaleString('fr-FR')} L</span>
+              <span className="font-semibold text-gray-800">{(data.find(d => d.name === 'Volume manquant')?.value || 0).toLocaleString('fr-FR')} L</span>
           </div>
       </div>
     </div>

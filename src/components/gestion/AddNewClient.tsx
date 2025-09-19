@@ -1,0 +1,191 @@
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from '@/components/ui/sheet';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { PlusCircle } from 'lucide-react';
+import type { Client, ClientInsert, ClientUpdate } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+
+const formSchema = z.object({
+  name: z.string().nonempty("Le nom est requis"),
+  phone: z.string().nonempty("Le téléphone est requis"),
+  address: z.string().nonempty("L'adresse est requise"),
+  contact_person: z.string().optional(),
+  email: z.string().email("L'email n'est pas valide").optional(),
+});
+
+interface AddNewClientProps {
+  createClient: (data: ClientInsert) => Promise<any>;
+  updateClient: (data: ClientUpdate) => Promise<any>;
+  clientToEdit?: Client | null;
+  onFinished: () => void;
+}
+
+const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient, clientToEdit, onFinished }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const isEditMode = !!clientToEdit;
+
+  const defaultValues = {
+    name: '',
+    phone: '',
+    address: '',
+    contact_person: '',
+    email: '',
+  };
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+  });
+
+  useEffect(() => {
+    if (clientToEdit) {
+      form.reset(clientToEdit);
+      setIsOpen(true);
+    }
+  }, [clientToEdit, form]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      // Reset form when closing
+      form.reset(defaultValues);
+      // Clear edit mode if we're not editing anymore
+      if (!clientToEdit) {
+        onFinished();
+      }
+    }
+  };
+
+  const handleNewClient = () => {
+    form.reset(defaultValues);
+    setIsOpen(true);
+  };
+
+  const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const success = isEditMode
+      ? await updateClient({ ...values, id: clientToEdit.id, user_id: user?.id })
+      : await createClient({ ...values, user_id: user?.id } as any);
+
+    if (success) {
+      form.reset();
+      setIsOpen(false);
+      onFinished();
+    }
+  };
+
+  return (
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetTrigger asChild>
+        <Button 
+          className='bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg'
+          onClick={handleNewClient}
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Ajouter un Client
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="flex flex-col w-full sm:max-w-lg h-full p-0">
+        <SheetHeader className="px-6 pt-6">
+          <SheetTitle className='text-black'>{isEditMode ? 'Modifier le client' : 'Ajouter un nouveau client'}</SheetTitle>
+          <SheetDescription className='text-gray-700'>
+            {isEditMode ? "Modifiez les informations du client ci-dessous." : "Remplissez les informations du nouveau client."}
+          </SheetDescription>
+        </SheetHeader>
+        <div className="flex-grow overflow-y-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col h-full">
+              <ScrollArea className="flex-grow px-6">
+                <div className="py-4 space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='text-gray-700'>Nom complet</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Jean Dupont" {...field} className='text-gray-700 border-2 border-gray-600' />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contact_person"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='text-gray-700'>Personne à contacter</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Jane Doe" {...field} className='text-gray-700 border-2 border-gray-600' />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='text-gray-700'>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: email@example.com" {...field} className='text-gray-700 border-2 border-gray-600' />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='text-gray-700'>Téléphone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: +221 77 123 45 67" {...field} className='text-gray-700 border-2 border-gray-600' />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='text-gray-700'>Adresse</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: 123, Rue de Dakar" {...field} className='text-gray-700 border-2 border-gray-600' />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </ScrollArea>
+              <SheetFooter className="px-6 py-4 mt-auto border-t border-gray-400 bg-background sticky bottom-0">
+                <div className="flex justify-end space-x-4 w-full">
+                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)}>
+                    Annuler
+                  </Button>
+                  <Button type="submit">
+                    {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
+                  </Button>
+                </div>
+              </SheetFooter>
+            </form>
+          </Form>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+export default AddNewClient;

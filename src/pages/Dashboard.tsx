@@ -26,7 +26,7 @@ export default function Dashboard() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-2xl shadow-sm">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Tableau de Bord en Temps Réel</h1>
                 </div>
@@ -93,7 +93,7 @@ export default function Dashboard() {
             {/* Charts */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2">
-                    <BarChartComponent data={barChartData} isLoading={isLoading} />
+                    <BarChartComponent data={barChartData} isLoading={isLoading} period={activeTab} />
                 </div>
                 <div className="lg:col-span-1">
                     <DonutChartComponent data={donutChartData} isLoading={isLoading} />
@@ -101,7 +101,7 @@ export default function Dashboard() {
             </div>
 
             {/* Recent Activities */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 pb-20 md:pb-0 lg:pb-0">
                 <div className="lg:col-span-2">
                     <RecentDeliveries deliveries={livraisonsRecentes} isLoading={isLoading} />
                 </div>

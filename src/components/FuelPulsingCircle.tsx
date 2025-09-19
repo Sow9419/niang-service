@@ -1,7 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion";
-
+import { url } from "inspector";
+import {LucideMessageCircleMore} from "lucide-react"
 export default function FuelPulsingCircle() {
   return (
     <div className="absolute bottom-8 right-8 z-30">
@@ -28,13 +29,15 @@ export default function FuelPulsingCircle() {
           </defs>
           <text className="text-sm fill-white/80">
             <textPath href="#circle" startOffset="0%">
-              FuelManager • Gestion Citernes • FuelManager • Gestion Citernes •
+              MAGIC•UX • Gestion Citernes • MAGIC•UX • Gestion Citernes •
             </textPath>
           </text>
         </motion.svg>
 
         <div className="relative w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-          <span className="text-black text-xs font-bold">⛽</span>
+          <span className="text-black text-xs font-bold">
+            <LucideMessageCircleMore className="w-6 h-6 text-white" onClick={()=> window.open("https://wa.me/22394231914", "_blank")}/>
+          </span>
         </div>
       </div>
     </div>

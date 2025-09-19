@@ -1,4 +1,4 @@
-import { Tables } from "./database";
+export * from './database';
 
 export type KpiCardProps = {
     title: string;
@@ -6,20 +6,6 @@ export type KpiCardProps = {
     change: string;
     changeType: 'increase' | 'decrease';
     icon: React.ElementType;
-};
-
-export type Commande = Tables<'commandes'>;
-export type Livraison = Tables<'livraisons'>;
-
-export type CommandeEnCours = Pick<Commande, 'id' | 'client_id' | 'quantite_commandee' | 'prix_total'> & {
-    clients: { nom: string } | null;
-};
-
-export type LivraisonRecente = Pick<Livraison, 'id' | 'commande_id' | 'statut' | 'date_livraison'> & {
-    commandes: {
-        quantite_commandee: number | null;
-        clients: { nom: string } | null;
-    } | null;
 };
 
 export type DonutChartData = {
@@ -31,3 +17,29 @@ export type BarChartData = {
     name: string;
     value: number;
 }[];
+
+// Types pour UI
+export type CommandeStatus = 'Non Livré' | 'Livré' | 'Annulée';
+export type LivraisonStatus = 'Non Livré' | 'Livré' | 'Annulée';
+export type LivraisonPaymentStatus = 'PAYÉ' | 'NON PAYÉ';
+import type { Conducteur } from './database';
+export type Driver = Conducteur;
+
+// Types pour Dashboard
+export interface CommandeEnCours {
+  id: number;
+  status: CommandeStatus;
+  quantity: number;
+  estimated_amount: number;
+  clients: { name: string };
+}
+
+export interface LivraisonRecente {
+  id: number;
+  status: LivraisonStatus;
+  date_livraison: string;
+  commandes: {
+    quantity: number;
+    clients: { name: string };
+  };
+}
