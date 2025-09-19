@@ -15,8 +15,8 @@ const navItems: { icon: React.ElementType; label: string; path: string }[] = [
 ];
 
 const Logo = () => (
-    <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-        <span className="text-white font-bold text-2xl">ln</span>
+    <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
+        <img src="/logo.png" alt="Logo" />
     </div>
 );
 

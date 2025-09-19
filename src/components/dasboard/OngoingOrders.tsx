@@ -43,6 +43,8 @@ const OngoingOrders: React.FC<OngoingOrdersProps> = ({ orders, isLoading }) => {
     );
   }
 
+  const nonDeliveredOrders = orders.filter(order => (order as any).status === 'Non Livré');
+
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
       <div className="flex justify-between items-center mb-4">
@@ -52,8 +54,8 @@ const OngoingOrders: React.FC<OngoingOrdersProps> = ({ orders, isLoading }) => {
         </Link>
       </div>
       <div className="space-y-4">
-        {orders.length > 0 ? (
-            orders.map((order) => (
+        {nonDeliveredOrders.length > 0 ? (
+            nonDeliveredOrders.map((order) => (
               <div key={order.id} className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl">
                 <OrderIcon statut={(order as any).status} />
                 <div className="flex-grow">

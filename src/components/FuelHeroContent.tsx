@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Fuel } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -47,7 +47,10 @@ export default function FuelHeroContent() {
                 Fonctionnalités
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white">
+              <DialogHeader className="relative bg-white p-0 flex items-baseline justify-center">
+                <DialogTitle className="text-2xl mb-0 text-black pl-8 pt-4">Fonctionnalités Complètes</DialogTitle>
+              </DialogHeader>
               <Features />
             </DialogContent>
           </Dialog>

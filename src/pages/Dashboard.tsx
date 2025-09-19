@@ -26,7 +26,7 @@ export default function Dashboard() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-2xl shadow-sm">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Tableau de Bord en Temps Réel</h1>
                 </div>

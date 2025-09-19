@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, User, Building2, Phone, Mail, Settings, Loader2 } from "lucide-react";
+import { LogOut, User, Building2, Phone, Mail, Settings, Loader2, MessageCircleMore } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Interface for user profile data
@@ -110,12 +110,11 @@ export function SettingsDialog() {
             </div>
           </div>
         )}
-        <div className="flex justify-center items-center pt-4 border-t-gray-300">
-            {/*<Button variant="ghost" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Paramètres
+        <div className="flex justify-center items-center pt-4 border-t-gray-300 space-x-4">
+            <Button onClick={() => window.open("https://wa.me/22394231914", "_blank")} className="bg-black text-white hover:bg-gray-900 w-full">
+                <MessageCircleMore className="w-4 h-4 mr-2" />
+                contacter le support
             </Button>
-            */}
             <Button
                 onClick={handleSignOut}
                 variant="outline"

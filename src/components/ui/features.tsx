@@ -3,11 +3,11 @@ import { Fuel, TrendingUp, Users, Truck, BarChart3, Shield } from 'lucide-react'
 
 export function Features() {
     return (
-        <section className="bg-gray-50 py-16 md:py-32 dark:bg-transparent">
+        <section className="bg-zinc-100 py-2 md:py-4 dark:bg-transparent">
             <div className="mx-auto max-w-3xl lg:max-w-5xl px-6">
                 <div className="relative">
                     <div className="relative z-10 grid grid-cols-6 gap-3">
-                        <Card className="relative col-span-full flex overflow-hidden lg:col-span-2">
+                        <Card className="relative col-span-full flex overflow-hidden lg:col-span-2 bg-white border-gray-200 shadow-md">
                             <CardContent className="relative m-auto size-fit pt-6">
                                 <div className="relative flex h-24 w-56 items-center">
                                     <svg className="text-muted absolute inset-0 size-full" viewBox="0 0 254 104" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,53 +16,53 @@ export function Features() {
                                             fill="currentColor"
                                         />
                                     </svg>
-                                    <span className="mx-auto block w-fit text-5xl font-semibold">100%</span>
+                                    <span className="mx-auto block w-fit text-5xl font-semibold text-black">100%</span>
                                 </div>
-                                <h2 className="mt-6 text-center text-3xl font-semibold">Efficace</h2>
+                                <h2 className="mt-6 text-center text-3xl font-semibold text-black">Efficace</h2>
                             </CardContent>
                         </Card>
-                        <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2">
+                        <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2 bg-white border-gray-200 shadow-md">
                             <CardContent className="pt-6">
-                                <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
+                                <div className="relative bg-zinc-50 mx-auto flex aspect-square size-32 rounded-full border-gray-700 before:absolute before:-inset-2 before:rounded-full before:border dark:border-gray-700 dark:before:border-gray-700">
                                     <Fuel className="m-auto h-fit w-16 text-primary" strokeWidth={1} />
                                 </div>
                                 <div className="relative z-10 mt-6 space-y-2 text-center">
-                                    <h2 className="group-hover:text-secondary-950 text-lg font-medium transition dark:text-white">Gestion Citernes</h2>
-                                    <p className="text-foreground">Surveillez vos citernes en temps réel avec notre système de monitoring avancé.</p>
+                                    <h2 className="text-black text-lg font-medium transition">Gestion Citernes</h2>
+                                    <p className="text-gray-700">Surveillez vos citernes en temps réel avec notre système de monitoring avancé.</p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2">
+                        <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2 bg-white border-gray-200 shadow-md">
                             <CardContent className="pt-6">
                                 <div className="pt-6 lg:px-6">
-                                    <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
+                                    <div className="relative bg-zinc-50 mx-auto flex aspect-square size-32 rounded-full border-gray-700 before:absolute before:-inset-2 before:rounded-full before:border dark:border-gray-700 dark:before:border-gray-700">
                                         <Truck className="m-auto h-fit w-16 text-secondary" strokeWidth={1} />
                                     </div>
                                 </div>
                                 <div className="relative z-10 mt-6 space-y-2 text-center">
-                                    <h2 className="text-lg font-medium transition">Livraisons Optimisées</h2>
-                                    <p className="text-foreground">Planifiez et suivez vos livraisons d'essence et gasoil avec précision.</p>
+                                    <h2 className="text-lg font-medium transition text-black">Livraisons Optimisées</h2>
+                                    <p className="text-gray-700">Planifiez et suivez vos livraisons d'essence et gasoil avec précision.</p>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="relative col-span-full overflow-hidden lg:col-span-3">
+                        <Card className="relative col-span-full overflow-hidden lg:col-span-3 bg-white border-gray-200 shadow-md">
                             <CardContent className="grid pt-6 sm:grid-cols-2">
                                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
-                                    <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
-                                        <BarChart3 className="m-auto size-5 text-accent" strokeWidth={1} />
+                                    <div className="relative flex aspect-square size-12 rounded-full border-gray-700 before:absolute bg-zinc-50 before:-inset-2 before:rounded-full before:border dark:border-gray-700 dark:before:border-gray-700">
+                                        <BarChart3 className="m-auto size-5 text-yellow-600" strokeWidth={2} />
                                     </div>
                                     <div className="space-y-2">
-                                        <h2 className="group-hover:text-secondary-950 text-lg font-medium text-zinc-800 transition dark:text-white">Analytics Avancés</h2>
-                                        <p className="text-foreground">Tableaux de bord en temps réel pour piloter votre activité avec intelligence.</p>
+                                        <h2 className="group-hover:text-secondary-950 text-lg font-medium text-black transition">Analytics Avancés</h2>
+                                        <p className="text-gray-700">Tableaux de bord en temps réel pour piloter votre activité avec intelligence.</p>
                                     </div>
                                 </div>
                                 <div className="rounded-tl-(--radius) relative -mb-6 -mr-6 mt-6 h-fit border-l border-t p-6 py-6 sm:ml-6">
                                     <div className="absolute left-3 top-2 flex gap-1">
-                                        <span className="block size-2 rounded-full border dark:border-white/10 dark:bg-white/10"></span>
-                                        <span className="block size-2 rounded-full border dark:border-white/10 dark:bg-white/10"></span>
-                                        <span className="block size-2 rounded-full border dark:border-white/10 dark:bg-white/10"></span>
+                                        <span className="block size-2 rounded-full border border-gray-700 bg-gray-700"></span>
+                                        <span className="block size-2 rounded-full border border-gray-700 bg-gray-700"></span>
+                                        <span className="block size-2 rounded-full border border-gray-700 bg-gray-700"></span>
                                     </div>
-                                    <svg className="w-full sm:w-[150%]" viewBox="0 0 366 231" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <svg className="w-full text-gray-700 sm:w-[150%]" viewBox="0 0 366 231" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
                                             fillRule="evenodd"
                                             clipRule="evenodd"
