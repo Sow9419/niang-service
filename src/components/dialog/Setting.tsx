@@ -66,8 +66,8 @@ export function SettingsDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Mon Compte</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-black">Mon Compte</DialogTitle>
+          <DialogDescription className="text-gray-700">
             Gérez les informations de votre profil et vos paramètres.
           </DialogDescription>
         </DialogHeader>
@@ -80,46 +80,47 @@ export function SettingsDialog() {
             {/* Profile Information */}
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 text-muted-foreground" />
+                <Mail className="w-4 h-4 text-gray-700" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{user?.email}</p>
+                  <p className="text-sm text-gray-700">Email</p>
+                  <p className="font-medium text-gray-700">{user?.email}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <User className="w-4 h-4 text-muted-foreground" />
+                <User className="w-4 h-4 text-gray-700" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Nom complet</p>
-                  <p className="font-medium">{profile?.full_name || "Non renseigné"}</p>
+                  <p className="text-sm text-gray-700">Nom complet</p>
+                  <p className="font-medium text-gray-700">{profile?.full_name || "Non renseigné"}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="w-4 h-4 text-muted-foreground" />
+                <Phone className="w-4 h-4 text-gray-700" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Téléphone</p>
-                  <p className="font-medium">{profile?.phone || "Non renseigné"}</p>
+                  <p className="text-sm text-gray-700">Téléphone</p>
+                  <p className="font-medium text-gray-700">{profile?.phone || "Non renseigné"}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Building2 className="w-4 h-4 text-muted-foreground" />
+                <Building2 className="w-4 h-4 text-gray-700" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Entreprise</p>
-                  <p className="font-medium">{profile?.company_name || "Non renseigné"}</p>
+                  <p className="text-sm text-gray-700">Entreprise</p>
+                  <p className="font-medium text-gray-700">{profile?.company_name || "Non renseigné"}</p>
                 </div>
               </div>
             </div>
           </div>
         )}
-        <div className="flex justify-between items-center pt-4 border-t">
-            <Button variant="ghost" size="sm">
+        <div className="flex justify-center items-center pt-4 border-t-gray-300">
+            {/*<Button variant="ghost" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
                 Paramètres
             </Button>
+            */}
             <Button
                 onClick={handleSignOut}
                 variant="outline"
                 size="sm"
-                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive w-full"
             >
                 <LogOut className="w-4 h-4 mr-2" />
                 Déconnexion

@@ -42,7 +42,7 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col justify-between items-center bg-white p-4 rounded-lg shadow space-y-4 sm:flex-row sm:space-y-0">
         <h1 className="text-3xl font-bold text-black">Gestion des Commandes</h1>
         {!isFormVisible && (
           <Button onClick={handleShowCreateForm}>

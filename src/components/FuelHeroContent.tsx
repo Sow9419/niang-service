@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowRight, Fuel, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function FuelHeroContent() {
   const [isFeatureDialogOpen, setIsFeatureDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <main className="absolute bottom-8 left-8 z-20 max-w-lg">
@@ -90,7 +92,10 @@ export default function FuelHeroContent() {
             </DialogContent>
           </Dialog>
           
-          <button className="px-8 py-3 rounded-full bg-white text-black font-normal text-xs transition-all duration-200 hover:bg-white/90 cursor-pointer">
+          <button
+            onClick={() => navigate("/signup")}
+            className="px-8 py-3 rounded-full bg-white text-black font-normal text-xs transition-all duration-200 hover:bg-white/90 cursor-pointer"
+          >
             Démarrer
           </button>
         </div>

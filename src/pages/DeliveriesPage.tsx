@@ -7,6 +7,8 @@ import { useCommandes } from "@/hooks/useCommandes";
 import { useCiternes } from "@/hooks/useCiternes";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Livraison } from "@/types";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 
 export default function DeliveriesPage() {
   const [isFormVisible, setFormVisible] = useState(false);
@@ -15,6 +17,11 @@ export default function DeliveriesPage() {
   const { commandes, loading: loadingCommandes } = useCommandes();
   const { citernes, loading: loadingCiternes } = useCiternes();
 
+
+    const handleShowCreateForm = () => {
+    setEditingDelivery(null);
+    setFormVisible(true);
+  };
   const handleEditDelivery = (livraison: Livraison) => {
     setEditingDelivery(livraison);
     setFormVisible(true);
@@ -42,8 +49,14 @@ export default function DeliveriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-black">Suivi des Livraisons</h1>
+      <div className="flex flex-col justify-between items-center bg-white p-4 rounded-lg shadow space-y-4 sm:flex-row sm:space-y-0">
+        <h1 className="text-3xl font-bold text-black">Gestion des Commandes</h1>
+        {!isFormVisible && (
+          <Button onClick={handleShowCreateForm}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Créer une nouvelle commande
+          </Button>
+        )}
       </div>
 
       {isFormVisible && (

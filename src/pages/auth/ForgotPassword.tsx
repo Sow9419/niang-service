@@ -37,22 +37,22 @@ export default function ForgotPassword() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8 bg-background">
-        <Card className="w-full max-w-md glass-effect border-primary/20">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-white/40">
+        <Card className="w-full max-w-md glass-effect border-primary/20 bg-white ">
           <CardHeader className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
-              <Mail className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/70 flex items-center justify-center">
+              <Mail className="w-8 h-8 text-gray-900" />
             </div>
-            <CardTitle className="text-2xl font-bold gradient-text">
+            <CardTitle className="text-2xl font-bold gradient-text text-black">
               Email envoyé !
             </CardTitle>
           </CardHeader>
           
           <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-gray-700">
               Nous avons envoyé un lien de réinitialisation à <strong>{email}</strong>
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-700">
               Vérifiez votre boîte de réception et cliquez sur le lien pour réinitialiser votre mot de passe.
             </p>
             
@@ -60,7 +60,7 @@ export default function ForgotPassword() {
               <Button
                 onClick={() => navigate("/")}
                 variant="fuel"
-                className="w-full"
+                className="w-full text-white"
               >
                 Retour à l'accueil
               </Button>
@@ -68,7 +68,7 @@ export default function ForgotPassword() {
               <Button
                 onClick={() => setEmailSent(false)}
                 variant="ghost"
-                className="w-full"
+                className="w-full text-gray-700"
               >
                 Renvoyer l'email
               </Button>
@@ -80,13 +80,13 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-background">
-      <Card className="w-full max-w-md glass-effect border-primary/20">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-md glass-effect border-primary/20 bg-white">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="text-2xl font-bold gradient-text text-black">
             Mot de passe oublié
           </CardTitle>
-          <p className="text-muted-foreground">
+          <p className="text-gray-700">
             Entrez votre email pour recevoir un lien de réinitialisation
           </p>
         </CardHeader>
@@ -96,7 +96,7 @@ export default function ForgotPassword() {
             <div className="space-y-2">
               <Label htmlFor="email" className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-primary" />
-                <span>Email</span>
+                <span className="text-gray-700">Email</span>
               </Label>
               <Input
                 id="email"
@@ -122,8 +122,8 @@ export default function ForgotPassword() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4" />
-                  <span>Envoyer le lien</span>
+                  <Mail className="w-4 h-4 text-gray-700" />
+                  <span className="text-gray-700">Envoyer le lien</span>
                 </div>
               )}
             </Button>
@@ -133,9 +133,9 @@ export default function ForgotPassword() {
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="text-primary hover:text-primary/80"
+              className="text-gray-700 hover:text-primary/80"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 mr-2 text-gray-700" />
               Retour à l'accueil
             </Button>
           </div>

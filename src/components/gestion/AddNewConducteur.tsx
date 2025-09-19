@@ -122,8 +122,8 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
       </SheetTrigger>
       <SheetContent className="flex flex-col w-full sm:max-w-lg h-full p-0">
         <SheetHeader className="px-6 pt-6">
-          <SheetTitle>{isEditMode ? 'Modifier le conducteur' : 'Ajouter un nouveau conducteur'}</SheetTitle>
-          <SheetDescription>
+          <SheetTitle className='text-black'>{isEditMode ? 'Modifier le conducteur' : 'Ajouter un nouveau conducteur'}</SheetTitle>
+          <SheetDescription className='text-gray-700'>
             {isEditMode ? "Modifiez les informations du conducteur." : "Remplissez les informations du nouveau conducteur."}
           </SheetDescription>
         </SheetHeader>
@@ -131,38 +131,15 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col h-full">
               <ScrollArea className="flex-grow px-6">
-                <div className="py-4 space-y-6">
-                  <div className="flex flex-col items-center space-y-4">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage src={avatarPreview || undefined} />
-                      <AvatarFallback>
-                        <User className="h-12 w-12" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <FormField
-                      control={form.control}
-                      name="avatar"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input id="avatar-upload" type="file" className="sr-only" onChange={handleAvatarChange} accept="image/*" />
-                          </FormControl>
-                          <Button asChild variant="outline">
-                            <label htmlFor="avatar-upload">Changer l'avatar</label>
-                          </Button>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                <div className="py-4 space-y-3">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nom complet</FormLabel>
+                        <FormLabel className='text-gray-700'>Nom complet</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Jean Dupont" {...field} />
+                          <Input placeholder="Ex: Jean Dupont" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -173,9 +150,9 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Téléphone</FormLabel>
+                        <FormLabel className='text-gray-700'>Téléphone</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: +221 77 123 45 67" {...field} />
+                          <Input placeholder="Ex: +221 77 123 45 67" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -186,10 +163,10 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Statut</FormLabel>
+                        <FormLabel className='text-gray-700'>Statut</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className='text-gray-700 border-2 border-gray-600'>
                               <SelectValue placeholder="Sélectionner un statut" />
                             </SelectTrigger>
                           </FormControl>
@@ -207,7 +184,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                  <Button type="button" className='text-gray-700 bg-white'  onClick={() => handleOpenChange(false)}>
                     Annuler
                   </Button>
                   <Button type="submit">

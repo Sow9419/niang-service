@@ -101,7 +101,7 @@ export default function Dashboard() {
             </div>
 
             {/* Recent Activities */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 pb-20 md:pb-0 lg:pb-0">
                 <div className="lg:col-span-2">
                     <RecentDeliveries deliveries={livraisonsRecentes} isLoading={isLoading} />
                 </div>

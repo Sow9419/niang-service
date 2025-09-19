@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Client } from '../../types';
-import { User, Edit } from 'lucide-react';
+import { UserPlus, Edit } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,7 @@ const ClientCard: React.FC<{ client: Client; onEdit: (client: Client) => void; }
         <div className="flex items-center gap-4">
             <Avatar className="h-10 w-10">
                 <AvatarFallback>
-                    <User className="h-5 w-5" />
+                    <UserPlus className="h-5 w-5" />
                 </AvatarFallback>
             </Avatar>
             <div>
@@ -55,7 +55,7 @@ const ClientList: React.FC<{ clients: Client[], isLoading: boolean, onEdit: (cli
                 <CardTitle className='text-black'>Clients</CardTitle>
             </CardHeader>
             <ScrollArea className="h-[320px]">
-                <CardContent className="divide-y">
+                <CardContent className="space-y-2">
                     {clients.length > 0 ? (
                         clients.map(client => (
                             <ClientCard key={client.id} client={client} onEdit={onEdit} />

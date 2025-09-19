@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Driver } from '../../types';
-import { Check, Truck, User, Edit } from 'lucide-react';
+import { Check, Truck, User, Edit, LucideTruck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,7 @@ const DriverStatusIcon: React.FC<{ status: Driver['status'] }> = ({ status }) =>
         case 'available':
             return <div className="w-8 h-8 flex items-center justify-center bg-green-300 rounded-full"><Check className="w-5 h-5 text-green-600" /></div>;
         case 'on_delivery':
-            return <div className="w-8 h-8 flex items-center justify-center bg-blue-500 rounded-full"><Truck className="w-5 h-5 text-blue-600" /></div>;
+            return <div className="w-8 h-8 flex items-center justify-center bg-blue-500 rounded-full"><Truck className="w-5 h-5 text-white" /></div>;
         default:
             return null;
     }
@@ -24,7 +24,7 @@ const DriverCard: React.FC<{ driver: Driver; onEdit: (driver: Driver) => void; }
             <Avatar className="h-10 w-10">
                 <AvatarImage src={driver.avatar_url || undefined} alt={driver.name} />
                 <AvatarFallback>
-                    <User className="h-5 w-5" />
+                    <LucideTruck className="h-5 w-5" />
                 </AvatarFallback>
             </Avatar>
             <div>
@@ -45,7 +45,7 @@ const DriverCard: React.FC<{ driver: Driver; onEdit: (driver: Driver) => void; }
 const DriverList: React.FC<{ drivers: Driver[], isLoading: boolean, onEdit: (driver: Driver) => void; }> = ({ drivers, isLoading, onEdit }) => {
     if (isLoading) {
         return (
-            <Card className="bg-white shadow-sm border-none w-auto">
+            <Card className="bg-white shadow-sm w-auto">
                 <CardHeader>
                     <Skeleton className="h-8 w-40 bg-gray-200" />
                 </CardHeader>
@@ -70,7 +70,7 @@ const DriverList: React.FC<{ drivers: Driver[], isLoading: boolean, onEdit: (dri
                 <CardTitle className='text-black'>Équipe de Conducteurs</CardTitle>
             </CardHeader>
             <ScrollArea className="h-[320px] w-auto">
-                <CardContent className="divide-y">
+                <CardContent className="space-y-2">
                     {drivers.length > 0 ? (
                         drivers.map(driver => (
                             <DriverCard key={driver.id} driver={driver} onEdit={onEdit} />

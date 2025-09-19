@@ -282,7 +282,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                                 const isEditing = livraison.id === editingDeliveryId;
                                 const totalAmount = (livraison.commandes?.unit_price ?? 0) * livraison.volume_livre;
                                 return (
-                                    <tr key={livraison.id} className="bg-white border-b hover:bg-gray-50">
+                                    <tr key={livraison.id} className="bg-white border-b border-gray-300 hover:bg-gray-50">
                                         <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap">{livraison.commandes?.order_number}</td>
                                         <td className="px-4 py-4">{livraison.commandes?.clients?.name}</td>
                                         <td className="px-4 py-4 font-medium text-gray-800">{livraison.commandes?.quantity?.toLocaleString('fr-FR')} L</td>
@@ -332,7 +332,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row justify-between items-center pt-4 mt-4 border-t">
+            <div className="flex flex-col sm:flex-row justify-between items-center pt-4 mt-4 border-t border-gray-200 gap-2">
                  <p className="text-sm text-gray-500 mb-4 sm:mb-0">
                    Affichage de <span className="font-semibold">{paginatedLivraisons.length > 0 ? startItem : 0}-{endItem}</span> sur <span className="font-semibold">{filteredLivraisons.length}</span>
                 </p>

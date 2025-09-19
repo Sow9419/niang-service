@@ -66,16 +66,16 @@ export default function ResetPassword() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-background">
-      <Card className="w-full max-w-md glass-effect border-primary/20">
+    <div className="min-h-screen flex items-center justify-center p-8 bg-white/40">
+      <Card className="w-full max-w-md glass-effect border-primary/20 bg-white">
         <CardHeader className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
             <Lock className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="text-2xl font-bold gradient-text text-black">
             Nouveau mot de passe
           </CardTitle>
-          <p className="text-muted-foreground">
+          <p className="text-gray-700">
             Créez un nouveau mot de passe sécurisé
           </p>
         </CardHeader>
@@ -85,7 +85,7 @@ export default function ResetPassword() {
             <div className="space-y-2">
               <Label htmlFor="password" className="flex items-center space-x-2">
                 <Lock className="w-4 h-4 text-primary" />
-                <span>Nouveau mot de passe</span>
+                <span className="text-gray-700">Nouveau mot de passe</span>
               </Label>
               <div className="relative">
                 <Input
@@ -116,7 +116,7 @@ export default function ResetPassword() {
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="flex items-center space-x-2">
                 <Lock className="w-4 h-4 text-primary" />
-                <span>Confirmer le mot de passe</span>
+                <span className="text-gray-700">Confirmer le mot de passe</span>
               </Label>
               <div className="relative">
                 <Input

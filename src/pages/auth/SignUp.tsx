@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff, ArrowRight, ArrowLeft, Building2, User, Phone, Mail, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { LoginDialog } from "@/components/auth/LoginDialog";
 
 export default function SignUp() {
   const [step, setStep] = useState(1);
@@ -79,10 +80,10 @@ export default function SignUp() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* Colonne gauche - Formulaire */}
-      <div className="flex items-center justify-center p-8 bg-background">
-        <Card className="w-full max-w-md glass-effect border-primary/20">
+      <div className="flex items-center justify-center p-2 bg-white/40">
+        <Card className="w-full max-w-md glass-effect border-primary/20 bg-white/70">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold gradient-text">
+            <CardTitle className="text-3xl font-bold text-black">
               Créer un compte
             </CardTitle>
             <p className="text-muted-foreground">
@@ -102,7 +103,7 @@ export default function SignUp() {
                 <div className="space-y-2">
                   <Label htmlFor="email" className="flex items-center space-x-2">
                     <Mail className="w-4 h-4 text-primary" />
-                    <span>Email</span>
+                    <span className="text-gray-700">Email</span>
                   </Label>
                   <Input
                     id="email"
@@ -118,7 +119,7 @@ export default function SignUp() {
                 <div className="space-y-2">
                   <Label htmlFor="password" className="flex items-center space-x-2">
                     <Lock className="w-4 h-4 text-primary" />
-                    <span>Mot de passe</span>
+                    <span className="text-gray-700">Mot de passe</span>
                   </Label>
                   <div className="relative">
                     <Input
@@ -149,7 +150,7 @@ export default function SignUp() {
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="flex items-center space-x-2">
                     <Lock className="w-4 h-4 text-primary" />
-                    <span>Confirmer le mot de passe</span>
+                    <span className="text-gray-700">Confirmer le mot de passe</span>
                   </Label>
                   <div className="relative">
                     <Input
@@ -187,7 +188,7 @@ export default function SignUp() {
                 <div className="space-y-2">
                   <Label htmlFor="fullName" className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-primary" />
-                    <span>Nom complet</span>
+                    <span className="text-gray-700">Nom complet</span>
                   </Label>
                   <Input
                     id="fullName"
@@ -203,7 +204,7 @@ export default function SignUp() {
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="flex items-center space-x-2">
                     <Phone className="w-4 h-4 text-primary" />
-                    <span>Téléphone</span>
+                    <span className="text-gray-700">Téléphone</span>
                   </Label>
                   <Input
                     id="phone"
@@ -219,7 +220,7 @@ export default function SignUp() {
                 <div className="space-y-2">
                   <Label htmlFor="companyName" className="flex items-center space-x-2">
                     <Building2 className="w-4 h-4 text-primary" />
-                    <span>Nom de l'entreprise</span>
+                    <span className="text-gray-700">Nom de l'entreprise</span>
                   </Label>
                   <Input
                     id="companyName"
@@ -237,9 +238,9 @@ export default function SignUp() {
                     type="button"
                     variant="outline"
                     onClick={() => setStep(1)}
-                    className="flex-1"
+                    className="flex-1 text-black bg-white"
                   >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    <ArrowLeft className="w-4 h-4 mr-2 text-black" />
                     Retour
                   </Button>
                   <Button
@@ -262,15 +263,16 @@ export default function SignUp() {
             )}
             
             <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-800">
                 Déjà un compte ?{" "}
-                <Button
-                  variant="link"
-                  className="p-0 h-auto text-primary hover:text-primary/80"
-                  onClick={() => navigate("/")}
-                >
-                  Se connecter
-                </Button>
+                <LoginDialog>
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto text-primary hover:text-primary/80"
+                  >
+                    Se connecter
+                  </Button>
+                </LoginDialog>
               </p>
             </div>
           </CardContent>
@@ -278,9 +280,11 @@ export default function SignUp() {
       </div>
 
       {/* Colonne droite - Image et marketing */}
-      <div className="relative hidden lg:flex items-center justify-center p-8 bg-gradient-to-br from-primary/20 to-primary-glow/20">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJoc2woMjE5IDkxJSA3MCUgLyAwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
-        
+      <div
+        className="relative hidden lg:flex items-center justify-center p-8 bg-cover bg-center"
+        style={{ backgroundImage: "url(/bg-station.jpg)" }}
+      >
+        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 text-center max-w-lg">
           <div className="w-32 h-32 mx-auto mb-8 rounded-full fuel-gradient flex items-center justify-center fuel-glow">
             <svg
@@ -299,40 +303,40 @@ export default function SignUp() {
             </svg>
           </div>
           
-          <h2 className="text-4xl font-bold text-foreground mb-6">
+          <h2 className="text-4xl font-bold text-white mb-6">
             Gérez vos livraisons de carburant
           </h2>
           
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-gray-200 mb-8">
             Une solution complète pour optimiser vos opérations de livraison d'essence et gasoil
           </p>
           
           <div className="space-y-4">
             <div className="flex items-center space-x-3 text-left">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 rounded-full bg-yellow-400/40 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="text-muted-foreground">Suivi en temps réel des citernes</span>
+              <span className="text-gray-300">Suivi en temps réel des citernes</span>
             </div>
             
             <div className="flex items-center space-x-3 text-left">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 rounded-full bg-yellow-400/40 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="text-muted-foreground">Gestion des commandes clients</span>
+              <span className="text-gray-300">Gestion des commandes clients</span>
             </div>
             
             <div className="flex items-center space-x-3 text-left">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 rounded-full bg-yellow-400/40 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="text-muted-foreground">Tableau de bord analytique</span>
+              <span className="text-gray-300">Tableau de bord analytique</span>
             </div>
           </div>
         </div>

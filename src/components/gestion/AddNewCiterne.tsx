@@ -99,8 +99,8 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
       </SheetTrigger>
       <SheetContent className="flex flex-col w-full sm:max-w-lg h-full p-0">
         <SheetHeader className="px-6 pt-6">
-          <SheetTitle>{isEditMode ? 'Modifier la citerne' : 'Ajouter une nouvelle citerne'}</SheetTitle>
-          <SheetDescription>
+          <SheetTitle className='text-black'>{isEditMode ? 'Modifier la citerne' : 'Ajouter une nouvelle citerne'}</SheetTitle>
+          <SheetDescription className='text-gray-700'>
             {isEditMode ? "Modifiez les informations de la citerne ci-dessous." : "Remplissez les informations de la nouvelle citerne."}
           </SheetDescription>
         </SheetHeader>
@@ -114,9 +114,9 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
                     name="registration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Immatriculation</FormLabel>
+                        <FormLabel className='text-gray-700'>Immatriculation</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: DK-1234-AB" {...field} />
+                          <Input placeholder="Ex: DK-1234-AB" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -127,9 +127,9 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
                     name="capacity_liters"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacité (Litres)</FormLabel>
+                        <FormLabel className='text-gray-700'>Capacité (Litres)</FormLabel>
                         <FormControl>
-                          <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                          <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -140,10 +140,10 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Statut</FormLabel>
+                        <FormLabel className='text-gray-700'>Statut</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className='text-gray-700 border-2 border-gray-600'>
                               <SelectValue placeholder="Sélectionner un statut" />
                             </SelectTrigger>
                           </FormControl>
@@ -162,10 +162,10 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
                     name="assigned_driver_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Conducteur assigné</FormLabel>
+                        <FormLabel className='text-gray-700'>Conducteur assigné</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className='text-gray-700 border-2 border-gray-600'>
                               <SelectValue placeholder="Sélectionner un conducteur" />
                             </SelectTrigger>
                           </FormControl>
@@ -184,9 +184,9 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
                   />
                 </div>
               </ScrollArea>
-              <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
+              <SheetFooter className="px-6 py-4 mt-auto border-t border-gray-400 bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)}>
                     Annuler
                   </Button>
                   <Button type="submit">

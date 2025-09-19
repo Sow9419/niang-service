@@ -93,8 +93,8 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
       </SheetTrigger>
       <SheetContent className="flex flex-col w-full sm:max-w-lg h-full p-0">
         <SheetHeader className="px-6 pt-6">
-          <SheetTitle>{isEditMode ? 'Modifier le client' : 'Ajouter un nouveau client'}</SheetTitle>
-          <SheetDescription>
+          <SheetTitle className='text-black'>{isEditMode ? 'Modifier le client' : 'Ajouter un nouveau client'}</SheetTitle>
+          <SheetDescription className='text-gray-700'>
             {isEditMode ? "Modifiez les informations du client ci-dessous." : "Remplissez les informations du nouveau client."}
           </SheetDescription>
         </SheetHeader>
@@ -108,9 +108,9 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nom complet</FormLabel>
+                        <FormLabel className='text-gray-700'>Nom complet</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Jean Dupont" {...field} />
+                          <Input placeholder="Ex: Jean Dupont" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -121,9 +121,9 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
                     name="contact_person"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Personne à contacter</FormLabel>
+                        <FormLabel className='text-gray-700'>Personne à contacter</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Jane Doe" {...field} />
+                          <Input placeholder="Ex: Jane Doe" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -134,9 +134,9 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel className='text-gray-700'>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: email@example.com" {...field} />
+                          <Input placeholder="Ex: email@example.com" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -147,9 +147,9 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Téléphone</FormLabel>
+                        <FormLabel className='text-gray-700'>Téléphone</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: +221 77 123 45 67" {...field} />
+                          <Input placeholder="Ex: +221 77 123 45 67" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -160,9 +160,9 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Adresse</FormLabel>
+                        <FormLabel className='text-gray-700'>Adresse</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: 123, Rue de Dakar" {...field} />
+                          <Input placeholder="Ex: 123, Rue de Dakar" {...field} className='text-gray-700 border-2 border-gray-600' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -170,9 +170,9 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
                   />
                 </div>
               </ScrollArea>
-              <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
+              <SheetFooter className="px-6 py-4 mt-auto border-t border-gray-400 bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)}>
                     Annuler
                   </Button>
                   <Button type="submit">
