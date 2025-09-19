@@ -1,10 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowRight, Fuel, TrendingUp, Users } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Fuel } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Features } from "@/components/ui/features";
 
 export default function FuelHeroContent() {
   const [isFeatureDialogOpen, setIsFeatureDialogOpen] = useState(false);
@@ -47,48 +47,8 @@ export default function FuelHeroContent() {
                 Fonctionnalités
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-3xl mb-4">Fonctionnalités Complètes</DialogTitle>
-              </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                  <Fuel className="w-8 h-8 text-primary mb-4" />
-                  <h3 className="font-semibold mb-2">Monitoring Citernes</h3>
-                  <p className="text-sm text-muted-foreground">Surveillance en temps réel des niveaux, température et qualité du carburant.</p>
-                </div>
-                <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                  <TrendingUp className="w-8 h-8 text-secondary mb-4" />
-                  <h3 className="font-semibold mb-2">Livraisons Optimisées</h3>
-                  <p className="text-sm text-muted-foreground">Planification automatique et tracking GPS des livraisons d'essence et gasoil.</p>
-                </div>
-                <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                  <Users className="w-8 h-8 text-accent mb-4" />
-                  <h3 className="font-semibold mb-2">CRM Intégré</h3>
-                  <p className="text-sm text-muted-foreground">Gestion complète de votre clientèle et historique des transactions.</p>
-                </div>
-                <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                  <div className="w-8 h-8 bg-primary/20 rounded mb-4 flex items-center justify-center">
-                    <span className="text-primary font-bold">AI</span>
-                  </div>
-                  <h3 className="font-semibold mb-2">Prédictions IA</h3>
-                  <p className="text-sm text-muted-foreground">Anticipez les besoins de ravitaillement avec notre IA prédictive.</p>
-                </div>
-                <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                  <div className="w-8 h-8 bg-secondary/20 rounded mb-4 flex items-center justify-center">
-                    <span className="text-secondary font-bold">📱</span>
-                  </div>
-                  <h3 className="font-semibold mb-2">App Mobile</h3>
-                  <p className="text-sm text-muted-foreground">Accès complet depuis votre smartphone ou tablette.</p>
-                </div>
-                <div className="p-6 border rounded-lg hover:border-primary/50 transition-colors">
-                  <div className="w-8 h-8 bg-accent/20 rounded mb-4 flex items-center justify-center">
-                    <span className="text-accent font-bold">🔒</span>
-                  </div>
-                  <h3 className="font-semibold mb-2">Sécurité Avancée</h3>
-                  <p className="text-sm text-muted-foreground">Chiffrement de bout en bout et conformité aux normes industrielles.</p>
-                </div>
-              </div>
+            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
+              <Features />
             </DialogContent>
           </Dialog>
           
