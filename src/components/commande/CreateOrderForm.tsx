@@ -21,9 +21,10 @@ interface CreateOrderFormProps {
   onSubmit: (data: CommandeInsert) => void;
   clients: Client[];
   commande?: Commande | null;
+  isSubmitting?: boolean;
 }
 
-const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, clients, commande }) => {
+const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, clients, commande, isSubmitting = false }) => {
   const isEditMode = !!commande;
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -173,8 +174,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose, onSubmit, cl
             <Button type="button" className='text-gray-900 bg-white border border-gray-300' onClick={onClose}>
               Annuler
             </Button>
-            <Button type="submit">
-              {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer la commande'}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'En cours...' : (isEditMode ? 'Enregistrer les modifications' : 'Enregistrer la commande')}
             </Button>
           </div>
         </form>

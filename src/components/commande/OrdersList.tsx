@@ -12,7 +12,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Commande } from '@/types';
-import type { CommandeStatus } from '@/types/database';
+import type { CommandeStatus } from '@/types';
 
 const OrderCardSkeleton = () => (
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">

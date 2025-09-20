@@ -7,7 +7,7 @@ import CreateOrderForm from "@/components/commande/CreateOrderForm";
 import { useCommandes } from "@/hooks/useCommandes";
 import { useClients } from "@/hooks/useClients";
 import type { Commande } from "@/types";
-import type { CommandeStatus } from "@/types/database";
+import type { CommandeStatus } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export default function OrdersPage() {

@@ -38,7 +38,7 @@ const fetchCommandes = async (userId: string, filters: CommandeFilters) => {
 
   // Apply filters
   if (filters.status && filters.status !== 'Tous') {
-    query = query.eq('status', filters.status);
+    query = query.eq('status', filters.status as any);
   }
 
   if (filters.searchTerm) {

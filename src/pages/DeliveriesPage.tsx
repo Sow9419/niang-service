@@ -13,9 +13,9 @@ import { PlusCircle } from "lucide-react";
 export default function DeliveriesPage() {
   const [isFormVisible, setFormVisible] = useState(false);
   const [editingDelivery, setEditingDelivery] = useState<Livraison | null>(null);
-  const { livraisons, loading: loadingLivraisons, updateLivraison } = useLivraisons();
+  const { livraisons, isLoading: loadingLivraisons, updateLivraison } = useLivraisons();
   const { data: commandes, isLoading: loadingCommandes } = useAllCommandes();
-  const { citernes, loading: loadingCiternes } = useCiternes();
+  const { citernes, isLoading: loadingCiternes } = useCiternes();
 
 
     const handleShowCreateForm = () => {
@@ -38,11 +38,9 @@ export default function DeliveriesPage() {
     const relatedCommande = commandes.find(c => c.id === editingDelivery.commande_id);
     const commandeQuantity = relatedCommande?.quantity;
 
-    const success = await updateLivraison({ ...livraisonData, id: editingDelivery.id }, commandeQuantity);
+    await updateLivraison.mutateAsync({ ...livraisonData, id: editingDelivery.id });
 
-    if (success) {
-      handleCloseForm();
-    }
+    handleCloseForm();
   };
 
   const isLoading = loadingLivraisons || loadingCommandes || loadingCiternes;
@@ -73,7 +71,7 @@ export default function DeliveriesPage() {
         livraisons={livraisons}
         onEdit={handleEditDelivery}
         editingDeliveryId={editingDelivery?.id || null}
-        onUpdate={updateLivraison}
+        onUpdate={(data) => updateLivraison.mutateAsync(data)}
         isLoading={isLoading}
       />
     </div>
