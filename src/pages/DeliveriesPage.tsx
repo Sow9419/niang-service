@@ -3,7 +3,7 @@ import { useState } from "react";
 import DeliveriesList from "@/components/livraison/DeliveriesList";
 import CreateDeliveryForm from "@/components/livraison/CreateDeliveryForm";
 import { useLivraisons } from "@/hooks/useLivraisons";
-import { useCommandes } from "@/hooks/useCommandes";
+import { useAllCommandes } from "@/hooks/useAllCommandes";
 import { useCiternes } from "@/hooks/useCiternes";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Livraison } from "@/types";
@@ -14,7 +14,7 @@ export default function DeliveriesPage() {
   const [isFormVisible, setFormVisible] = useState(false);
   const [editingDelivery, setEditingDelivery] = useState<Livraison | null>(null);
   const { livraisons, loading: loadingLivraisons, updateLivraison } = useLivraisons();
-  const { commandes, loading: loadingCommandes } = useCommandes();
+  const { data: commandes, isLoading: loadingCommandes } = useAllCommandes();
   const { citernes, loading: loadingCiternes } = useCiternes();
 
 

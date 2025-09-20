@@ -1,256 +1,129 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import type { Livraison, LivraisonInsert, LivraisonUpdate } from '@/types/database';
 
+const fetchLivraisons = async (userId: string) => {
+  if (!userId) return [];
+
+  const { data, error } = await supabase
+    .from('livraisons')
+    .select(`
+      *,
+      commandes (
+        *,
+        clients (*)
+      ),
+      citernes (
+        *,
+        conducteurs (*)
+      )
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
 export function useLivraisons() {
-  const [livraisons, setLivraisons] = useState<Livraison[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Charger toutes les livraisons avec les détails
-  const fetchLivraisons = async () => {
-    if (!user) return;
+  const { data: livraisons, isLoading, isError, error } = useQuery<Livraison[], Error>({
+    queryKey: ['livraisons', user?.id],
+    queryFn: () => fetchLivraisons(user!.id),
+    enabled: !!user,
+  });
 
-    try {
-      setLoading(true);
+  const createLivraison = useMutation({
+    mutationFn: async (livraisonData: LivraisonInsert) => {
+      if (!user) throw new Error("User not authenticated");
+
       const { data, error } = await supabase
         .from('livraisons')
-        .select(`
-          *,
-          commandes:commande_id (
-            id,
-            order_number,
-            product,
-            quantity,
-            estimated_amount,
-            clients:client_id (
-              id,
-              name,
-              contact_person
-            )
-          ),
-          citernes:citerne_id (
-            id,
-            registration,
-            capacity_liters,
-            conducteurs:assigned_driver_id (
-              id,
-              name,
-              phone
-            )
-          )
-        `, { count: 'exact' })
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setLivraisons(data as any || []);
-    } catch (error) {
-      console.error('Error fetching livraisons:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les livraisons",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Créer une nouvelle livraison
-  const createLivraison = async (livraisonData: LivraisonInsert, commandeQuantity: number) => {
-    if (!user) return null;
-
-    try {
-      // Calculer automatiquement le volume livré
-      const volumeLivre = commandeQuantity - livraisonData.volume_manquant;
-      
-      // Récupérer le prix unitaire de la commande pour calculer le montant total
-      const { data: commandeData } = await supabase
-        .from('commandes')
-        .select('unit_price')
-        .eq('id', livraisonData.commande_id)
-        .single();
-      
-      const montantTotal = volumeLivre * (commandeData?.unit_price || 0);
-      
-      const { data, error } = await supabase
-        .from('livraisons')
-        .insert([{ 
-          ...livraisonData, 
-          volume_livre: volumeLivre,
-          montant_total: montantTotal,
-          user_id: user.id 
-        }])
-        .select(`
-          *,
-          commandes:commande_id (
-            id,
-            order_number,
-            product,
-            quantity,
-            estimated_amount,
-            clients:client_id (
-              id,
-              name,
-              contact_person
-            )
-          ),
-          citernes:citerne_id (
-            id,
-            registration,
-            capacity_liters,
-            conducteurs:assigned_driver_id (
-              id,
-              name,
-              phone
-            )
-          )
-        `)
+        .insert({ ...livraisonData, user_id: user.id })
+        .select()
         .single();
 
       if (error) throw error;
-
-      // Mettre à jour le statut de la commande
-      await supabase
-        .from('commandes')
-        .update({ status: data.status })
-        .eq('id', data.commande_id);
-
-      setLivraisons(prev => [data as any, ...prev]);
-      toast({
-        title: "Succès",
-        description: "Livraison créée avec succès",
-      });
       return data;
-    } catch (error) {
-      console.error('Error creating livraison:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer la livraison",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+    },
+    onSuccess: (data) => {
+      toast({ title: "Succès", description: "Livraison créée avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['livraisons'] });
+      // Also invalidate commandes as their status might change
+      queryClient.invalidateQueries({ queryKey: ['commandes'] });
+      queryClient.invalidateQueries({ queryKey: ['allCommandes'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de créer la livraison: ${error.message}`, variant: "destructive" });
+    },
+  });
 
-  // Mettre à jour une livraison
-  const updateLivraison = async (livraisonData: LivraisonUpdate, commandeQuantity?: number) => {
-    try {
-      // Recalculer le volume livré si volume_manquant est modifié
-      const updateData = { ...livraisonData };
-      if (commandeQuantity && livraisonData.volume_manquant !== undefined) {
-        updateData.volume_livre = commandeQuantity - livraisonData.volume_manquant;
-      }
+  const updateLivraison = useMutation({
+    mutationFn: async (livraisonData: LivraisonUpdate) => {
+      if (!user) throw new Error("User not authenticated");
 
       const { data, error } = await supabase
         .from('livraisons')
-        .update(updateData)
-        .eq('id', livraisonData.id)
-        .eq('user_id', user?.id)
-        .select(`
-          *,
-          commandes:commande_id (
-            id,
-            order_number,
-            product,
-            quantity,
-            estimated_amount,
-            clients:client_id (
-              id,
-              name,
-              contact_person
-            )
-          ),
-          citernes:citerne_id (
-            id,
-            registration,
-            capacity_liters,
-            conducteurs:assigned_driver_id (
-              id,
-              name,
-              phone
-            )
-          )
-        `)
+        .update(livraisonData)
+        .eq('id', livraisonData.id!)
+        .eq('user_id', user.id)
+        .select()
         .single();
 
       if (error) throw error;
+      return data;
+    },
+    onSuccess: async (data) => {
+      toast({ title: "Succès", description: "Livraison mise à jour avec succès." });
 
-      // Synchroniser le statut avec la commande si modifié
-      if (livraisonData.status) {
+      // Synchronize the command status if the delivery status was changed
+      if (data.status && data.commande_id) {
         await supabase
           .from('commandes')
-          .update({ status: livraisonData.status })
+          .update({ status: data.status })
           .eq('id', data.commande_id);
       }
 
-      setLivraisons(prev => prev.map(livraison => 
-        livraison.id === livraisonData.id ? data as any : livraison
-      ));
-      toast({
-        title: "Succès",
-        description: "Livraison mise à jour avec succès",
-      });
-      return data;
-    } catch (error) {
-      console.error('Error updating livraison:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la livraison",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ['livraisons'] });
+      queryClient.invalidateQueries({ queryKey: ['commandes'] });
+      queryClient.invalidateQueries({ queryKey: ['allCommandes'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de mettre à jour la livraison: ${error.message}`, variant: "destructive" });
+    },
+  });
 
-  // Supprimer une livraison
-  const deleteLivraison = async (livraisonId: number) => {
-    try {
+  const deleteLivraison = useMutation({
+    mutationFn: async (livraisonId: number) => {
+      if (!user) throw new Error("User not authenticated");
       const { error } = await supabase
         .from('livraisons')
         .delete()
         .eq('id', livraisonId)
-        .eq('user_id', user?.id);
-
+        .eq('user_id', user.id);
       if (error) throw error;
-
-      setLivraisons(prev => prev.filter(livraison => livraison.id !== livraisonId));
-      toast({
-        title: "Succès",
-        description: "Livraison supprimée avec succès",
-      });
-      return true;
-    } catch (error) {
-      console.error('Error deleting livraison:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la livraison",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  // Calculer le volume livré
-  const calculateVolumeLivre = (quantiteCommande: number, volumeManquant: number) => {
-    return quantiteCommande - volumeManquant;
-  };
-
-  useEffect(() => {
-    fetchLivraisons();
-  }, [user]);
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Livraison supprimée avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['livraisons'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de supprimer la livraison: ${error.message}`, variant: "destructive" });
+    },
+  });
 
   return {
-    livraisons,
-    loading,
+    livraisons: livraisons ?? [],
+    isLoading,
+    isError,
+    error,
     createLivraison,
     updateLivraison,
     deleteLivraison,
-    calculateVolumeLivre,
-    refetch: fetchLivraisons
   };
 }

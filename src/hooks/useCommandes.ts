@@ -29,7 +29,9 @@ const fetchCommandes = async (userId: string, filters: CommandeFilters) => {
         contact_person,
         email,
         phone,
-        address
+        address,
+        created_at,
+        updated_at
       )
     `, { count: 'exact' })
     .eq('user_id', userId);

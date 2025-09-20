@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle } from 'lucide-react';
 import type { Citerne, CiterneInsert, CiterneUpdate, Conducteur } from '@/types';
+import { UseMutationResult } from '@tanstack/react-query';
 
 const formSchema = z.object({
   registration: z.string().nonempty("L'immatriculation est requise"),
@@ -19,8 +20,8 @@ const formSchema = z.object({
 });
 
 interface AddNewCiterneProps {
-  createCiterne: (data: CiterneInsert) => Promise<any>;
-  updateCiterne: (data: CiterneUpdate) => Promise<any>;
+  createCiterne: UseMutationResult<any, Error, CiterneInsert, unknown>;
+  updateCiterne: UseMutationResult<any, Error, CiterneUpdate, unknown>;
   citerneToEdit?: Citerne | null;
   drivers: Conducteur[];
   onFinished: () => void;
@@ -29,6 +30,7 @@ interface AddNewCiterneProps {
 const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCiterne, citerneToEdit, drivers, onFinished }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const isEditMode = !!citerneToEdit;
+  const isSubmitting = createCiterne.isPending || updateCiterne.isPending;
 
   const defaultValues = {
     registration: '',
@@ -46,21 +48,20 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
     if (citerneToEdit) {
       form.reset({
         ...citerneToEdit,
-        assigned_driver_id: citerneToEdit.assigned_driver_id || null,
+        capacity_liters: citerneToEdit.capacity_liters || 0,
+        assigned_driver_id: citerneToEdit.assigned_driver_id || undefined,
       });
       setIsOpen(true);
+    } else {
+        form.reset(defaultValues);
     }
   }, [citerneToEdit, form]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      // Reset form when closing
       form.reset(defaultValues);
-      // Clear edit mode if we're not editing anymore
-      if (!citerneToEdit) {
-        onFinished();
-      }
+      onFinished();
     }
   };
 
@@ -70,19 +71,23 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
   };
 
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
-    const data = {
-        ...values,
-        assigned_driver_id: values.assigned_driver_id === 'unassigned' || values.assigned_driver_id === '' ? null : values.assigned_driver_id,
-    };
+    try {
+        const submissionData = {
+            ...values,
+            assigned_driver_id: values.assigned_driver_id === 'unassigned' || !values.assigned_driver_id ? null : values.assigned_driver_id,
+        };
 
-    const success = isEditMode
-      ? await updateCiterne({ ...data, id: citerneToEdit!.id })
-      : await createCiterne(data as CiterneInsert);
+        if (isEditMode) {
+            await updateCiterne.mutateAsync({ ...submissionData, id: citerneToEdit!.id });
+        } else {
+            await createCiterne.mutateAsync(submissionData as CiterneInsert);
+        }
 
-    if (success) {
-      form.reset();
-      setIsOpen(false);
-      onFinished();
+        form.reset(defaultValues);
+        setIsOpen(false);
+        onFinished();
+    } catch (error) {
+        console.error("Failed to save citerne:", error);
     }
   };
 
@@ -186,11 +191,11 @@ const AddNewCiterne: React.FC<AddNewCiterneProps> = ({ createCiterne, updateCite
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t border-gray-400 bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)}>
+                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
                     Annuler
                   </Button>
-                  <Button type="submit">
-                    {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Enregistrer')}
                   </Button>
                 </div>
               </SheetFooter>

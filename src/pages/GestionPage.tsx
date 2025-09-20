@@ -12,8 +12,8 @@ import AddNewClient from "@/components/gestion/AddNewClient";
 import type { Citerne, Conducteur, Client } from "@/types";
 
 export default function GestionPage() {
-  const { citernes, loading: loadingCiternes, createCiterne, updateCiterne } = useCiternes();
-  const { conducteurs, loading: loadingConducteurs, createConducteur, updateConducteur } = useConducteurs();
+  const { citernes, isLoading: loadingCiternes, createCiterne, updateCiterne } = useCiternes();
+  const { conducteurs, isLoading: loadingConducteurs, createConducteur, updateConducteur } = useConducteurs();
   const { clients, isLoading: loadingClients, createClient, updateClient } = useClients();
 
   const [editingCiterne, setEditingCiterne] = useState<Citerne | null>(null);
