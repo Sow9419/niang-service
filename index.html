@@ -15,11 +15,23 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@fuelmanager" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- 🔥 enregistrement service worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register("/service-worker.js")
+            .then(() => console.log("Service Worker enregistré avec succès ✅"))
+            .catch(err => console.error("Erreur lors de l'enregistrement du Service Worker 😢", err));
+        });
+      }
+    </script>
   </body>
 </html>
