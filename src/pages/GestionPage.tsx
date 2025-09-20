@@ -14,7 +14,7 @@ import type { Citerne, Conducteur, Client } from "@/types";
 export default function GestionPage() {
   const { citernes, loading: loadingCiternes, createCiterne, updateCiterne } = useCiternes();
   const { conducteurs, loading: loadingConducteurs, createConducteur, updateConducteur } = useConducteurs();
-  const { clients, loading: loadingClients, createClient, updateClient } = useClients();
+  const { clients, isLoading: loadingClients, createClient, updateClient } = useClients();
 
   const [editingCiterne, setEditingCiterne] = useState<Citerne | null>(null);
   const [editingConducteur, setEditingConducteur] = useState<Conducteur | null>(null);
