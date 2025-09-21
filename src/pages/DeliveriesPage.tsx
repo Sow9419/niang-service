@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Livraison } from "@/types";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function DeliveriesPage() {
   const [isFormVisible, setFormVisible] = useState(false);
@@ -17,7 +18,7 @@ export default function DeliveriesPage() {
   const { data: commandes, isLoading: loadingCommandes } = useAllCommandes();
   const { citernes, isLoading: loadingCiternes } = useCiternes();
 
-
+   const navigator = useNavigate();
     const handleShowCreateForm = () => {
     setEditingDelivery(null);
     setFormVisible(true);
@@ -50,7 +51,7 @@ export default function DeliveriesPage() {
       <div className="flex flex-col justify-between items-center bg-white p-4 rounded-lg shadow space-y-4 sm:flex-row sm:space-y-0">
         <h1 className="text-3xl font-bold text-black">Gestion des Commandes</h1>
         {!isFormVisible && (
-          <Button onClick={handleShowCreateForm}>
+          <Button onClick={() => navigator('/orders')} >
             <PlusCircle className="mr-2 h-4 w-4" />
             Créer une nouvelle commande
           </Button>

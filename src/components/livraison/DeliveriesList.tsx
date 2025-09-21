@@ -341,7 +341,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                         <button 
                             onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1}
-                            className="px-3 py-1.5 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 text-sm"
+                            className="px-3 py-1.5 border bg-yellow-700 border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 text-sm hover:text-gray-700 text-white"
                         >
                             Précédent
                         </button>
@@ -349,7 +349,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                             <button
                                 key={page}
                                 onClick={() => handlePageChange(page)}
-                                className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors text-sm font-medium ${currentPage === page ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
+                                className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors text-sm font-medium text-gray-700 ${currentPage === page ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
                             >
                                 {page}
                             </button>
@@ -357,7 +357,7 @@ const DeliveriesList: React.FC<DeliveriesListProps> = ({ livraisons, onEdit, edi
                         <button 
                             onClick={() => handlePageChange(currentPage + 1)}
                             disabled={currentPage === totalPages}
-                            className="px-3 py-1.5 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 text-sm"
+                            className="px-3 py-1.5 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 text-sm text-gray-700"
                         >
                             Suivant
                         </button>
