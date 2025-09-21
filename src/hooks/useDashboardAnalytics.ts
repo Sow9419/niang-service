@@ -55,151 +55,29 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const { start, p_start, p_end } = getDates(period);
+                const { data, error } = await supabase.rpc('get_dashboard_analytics', { p_period: period });
 
-                const p1 = supabase.from('livraisons').select('montant_total').eq('status', 'Livré').gte('created_at', start);
-                const p2 = supabase.from('livraisons').select('montant_total').eq('status', 'Livré').gte('created_at', p_start).lt('created_at', p_end);
-                const p3 = supabase.from('livraisons').select('volume_livre').eq('status', 'Livré').gte('date_livraison', start);
-                const p4 = supabase.from('livraisons').select('volume_livre').eq('status', 'Livré').gte('date_livraison', p_start).lt('date_livraison', p_end);
-                const p5 = supabase.from('commandes').select('id', { count: 'exact' }).in('status', ['Non Livré']);
-                const p6 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('status', 'Livré').gte('date_livraison', start);
-                const p7 = supabase.from('livraisons').select('id', { count: 'exact' }).eq('status', 'Livré').gte('date_livraison', p_start).lt('date_livraison', p_end);
-                const p8 = supabase.from('commandes').select(`id, status, quantity, estimated_amount, clients ( name )`).in('status', ['Non Livré', 'Livré']).order('created_at', { ascending: false }).limit(3);
-                const p9 = supabase.from('livraisons').select(`id, status, date_livraison, volume_livre, commandes ( quantity, clients ( name ) )`).eq('status', 'Livré').order('date_livraison', { ascending: false }).limit(3);
-
-                const [ 
-                    currentRevenueRes, previousRevenueRes, currentVolumeRes, previousVolumeRes, 
-                    ordersRes, currentDeliveriesRes, previousDeliveriesRes, commandesRes, livraisonsRes
-                ] = await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8, p9]);
-
-                const currentRevenue = currentRevenueRes.data?.reduce((sum, item) => sum + (item.montant_total || 0), 0) || 0;
-                const previousRevenue = previousRevenueRes.data?.reduce((sum, item) => sum + (item.montant_total || 0), 0) || 0;
-                const currentVolume = currentVolumeRes.data?.reduce((sum, item) => sum + (item.volume_livre || 0), 0) || 0;
-                const previousVolume = previousVolumeRes.data?.reduce((sum, item) => sum + (item.volume_livre || 0), 0) || 0;
-                
-                setKpiData({
-                    revenue: currentRevenue,
-                    volume: currentVolume,
-                    orders: ordersRes.count || 0,
-                    deliveries: currentDeliveriesRes.count || 0,
-                    revenueChange: calculateChange(currentRevenue, previousRevenue),
-                    volumeChange: calculateChange(currentVolume, previousVolume),
-                    ordersChange: 0, 
-                    deliveriesChange: calculateChange(currentDeliveriesRes.count || 0, previousDeliveriesRes.count || 0),
-                });
-
-                if (commandesRes.error) throw commandesRes.error;
-                setCommandesEnCours(commandesRes.data as CommandeEnCours[]);
-
-                if (livraisonsRes.error) throw livraisonsRes.error;
-                setLivraisonsRecentes(livraisonsRes.data as LivraisonRecente[]);
-
-                // Calculer le volume manquant total depuis les livraisons
-                const totalVolumeManquant = await supabase
-                    .from('livraisons')
-                    .select('volume_manquant')
-                    .gte('created_at', start);
-                
-                const volumeManquant = totalVolumeManquant.data?.reduce((sum, item) => sum + (item.volume_manquant || 0), 0) || 0;
-
-                setDonutChartData([
-                    { name: 'Volume livré', value: currentVolume },
-                    { name: 'Volume manquant', value: volumeManquant },
-                ]);
-
-                // Données pour le graphique en barres selon la période
-                let chartData = [];
-                
-                if (period === 'Jour') {
-                    // Chiffre d'affaires par jour de la semaine (7 derniers jours)
-                    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-                    
-                    for (let i = 0; i < 7; i++) {
-                        const dayStart = new Date();
-                        dayStart.setDate(dayStart.getDate() - (6 - i));
-                        dayStart.setHours(0, 0, 0, 0);
-                        
-                        const dayEnd = new Date(dayStart);
-                        dayEnd.setHours(23, 59, 59, 999);
-
-                        const dayRevenue = await supabase
-                            .from('livraisons')
-                            .select('montant_total')
-                            .eq('status', 'Livré')
-                            .gte('date_livraison', dayStart.toISOString().split('T')[0])
-                            .lte('date_livraison', dayEnd.toISOString().split('T')[0]);
-
-                        const revenue = dayRevenue.data?.reduce((sum: number, item: any) => {
-                            return sum + (item.montant_total || 0);
-                        }, 0) || 0;
-
-                        chartData.push({
-                            name: days[dayStart.getDay()],
-                            value: revenue
-                        });
-                    }
-                } else if (period === 'Semaine') {
-                    // Chiffre d'affaires par semaine (4 dernières semaines)
-                    for (let i = 0; i < 4; i++) {
-                        const weekStart = new Date();
-                        const currentWeek = weekStart.getDay();
-                        weekStart.setDate(weekStart.getDate() - (currentWeek === 0 ? 6 : currentWeek - 1) - (i * 7));
-                        weekStart.setHours(0, 0, 0, 0);
-                        
-                        const weekEnd = new Date(weekStart);
-                        weekEnd.setDate(weekEnd.getDate() + 6);
-                        weekEnd.setHours(23, 59, 59, 999);
-
-                        const weekRevenue = await supabase
-                            .from('livraisons')
-                            .select('montant_total')
-                            .eq('status', 'Livré')
-                            .gte('date_livraison', weekStart.toISOString().split('T')[0])
-                            .lte('date_livraison', weekEnd.toISOString().split('T')[0]);
-
-                        const revenue = weekRevenue.data?.reduce((sum: number, item: any) => {
-                            return sum + (item.montant_total || 0);
-                        }, 0) || 0;
-
-                        chartData.unshift({
-                            name: `S${4 - i}`,
-                            value: revenue
-                        });
-                    }
-                } else if (period === 'Mois') {
-                    // Chiffre d'affaires par mois (12 derniers mois)
-                    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-                    
-                    for (let i = 0; i < 12; i++) {
-                        const monthStart = new Date();
-                        monthStart.setMonth(monthStart.getMonth() - (11 - i));
-                        monthStart.setDate(1);
-                        monthStart.setHours(0, 0, 0, 0);
-                        
-                        const monthEnd = new Date(monthStart);
-                        monthEnd.setMonth(monthEnd.getMonth() + 1);
-                        monthEnd.setDate(0);
-                        monthEnd.setHours(23, 59, 59, 999);
-
-                        const monthRevenue = await supabase
-                            .from('livraisons')
-                            .select('montant_total')
-                            .eq('status', 'Livré')
-                            .gte('date_livraison', monthStart.toISOString().split('T')[0])
-                            .lte('date_livraison', monthEnd.toISOString().split('T')[0]);
-
-                        const revenue = monthRevenue.data?.reduce((sum: number, item: any) => {
-                            return sum + (item.montant_total || 0);
-                        }, 0) || 0;
-
-                        chartData.push({
-                            name: months[monthStart.getMonth()],
-                            value: revenue
-                        });
-                    }
+                if (error) {
+                    throw error;
                 }
 
-                setBarChartData(chartData);
+                const { kpiData: kpi, commandesEnCours, livraisonsRecentes, donutChartData, barChartData } = data;
+
+                setKpiData({
+                    revenue: kpi.current_revenue,
+                    volume: kpi.current_volume,
+                    orders: kpi.orders_in_progress,
+                    deliveries: kpi.current_deliveries,
+                    revenueChange: calculateChange(kpi.current_revenue, kpi.previous_revenue),
+                    volumeChange: calculateChange(kpi.current_volume, kpi.previous_volume),
+                    ordersChange: 0, // This was 0 in the original code
+                    deliveriesChange: calculateChange(kpi.current_deliveries, kpi.previous_deliveries),
+                });
+
+                setCommandesEnCours(commandesEnCours || []);
+                setLivraisonsRecentes(livraisonsRecentes || []);
+                setDonutChartData(donutChartData || []);
+                setBarChartData(barChartData || []);
 
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
