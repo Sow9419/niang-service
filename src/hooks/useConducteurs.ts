@@ -1,141 +1,107 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import type { Conducteur, ConducteurInsert, ConducteurUpdate } from '@/types/database';
 
+// Function to fetch conducteurs from Supabase
+const fetchConducteurs = async (userId: string) => {
+  if (!userId) return [];
+
+  const { data, error } = await supabase
+    .from('conducteurs')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+// The main hook
 export function useConducteurs() {
-  const [conducteurs, setConducteurs] = useState<Conducteur[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Charger tous les conducteurs
-  const fetchConducteurs = async () => {
-    if (!user) return;
+  // Query to fetch the list of conducteurs
+  const { data: conducteurs, isLoading, isError, error } = useQuery<Conducteur[], Error>({
+    queryKey: ['conducteurs', user?.id],
+    queryFn: () => fetchConducteurs(user!.id),
+    enabled: !!user,
+  });
 
-    try {
-      setLoading(true);
+  // Mutation for creating a new conducteur
+  const createConducteur = useMutation({
+    mutationFn: async (conducteurData: ConducteurInsert) => {
+      if (!user) throw new Error("User not authenticated");
       const { data, error } = await supabase
         .from('conducteurs')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setConducteurs(data || []);
-    } catch (error) {
-      console.error('Error fetching conducteurs:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les conducteurs",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Créer un nouveau conducteur
-  const createConducteur = async (conducteurData: ConducteurInsert) => {
-    if (!user) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('conducteurs')
-        .insert([{ ...conducteurData, user_id: user.id }])
+        .insert({ ...conducteurData, user_id: user.id })
         .select()
         .single();
-
       if (error) throw error;
-
-      setConducteurs(prev => [data, ...prev]);
-      toast({
-        title: "Succès",
-        description: "Conducteur créé avec succès",
-      });
       return data;
-    } catch (error) {
-      console.error('Error creating conducteur:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer le conducteur",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Conducteur créé avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['conducteurs'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de créer le conducteur: ${error.message}`, variant: "destructive" });
+    },
+  });
 
-  // Mettre à jour un conducteur
-  const updateConducteur = async (conducteurData: ConducteurUpdate) => {
-    try {
+  // Mutation for updating a conducteur
+  const updateConducteur = useMutation({
+    mutationFn: async (conducteurData: ConducteurUpdate) => {
+      if (!user) throw new Error("User not authenticated");
       const { data, error } = await supabase
         .from('conducteurs')
         .update(conducteurData)
-        .eq('id', conducteurData.id)
-        .eq('user_id', user?.id)
+        .eq('id', conducteurData.id!)
+        .eq('user_id', user.id)
         .select()
         .single();
-
       if (error) throw error;
-
-      setConducteurs(prev => prev.map(conducteur => 
-        conducteur.id === conducteurData.id ? data : conducteur
-      ));
-      toast({
-        title: "Succès",
-        description: "Conducteur mis à jour avec succès",
-      });
       return data;
-    } catch (error) {
-      console.error('Error updating conducteur:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le conducteur",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Conducteur mis à jour avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['conducteurs'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de mettre à jour le conducteur: ${error.message}`, variant: "destructive" });
+    },
+  });
 
-  // Supprimer un conducteur
-  const deleteConducteur = async (conducteurId: string) => {
-    try {
+  // Mutation for deleting a conducteur
+  const deleteConducteur = useMutation({
+    mutationFn: async (conducteurId: string) => {
+      if (!user) throw new Error("User not authenticated");
       const { error } = await supabase
         .from('conducteurs')
         .delete()
         .eq('id', conducteurId)
-        .eq('user_id', user?.id);
-
+        .eq('user_id', user.id);
       if (error) throw error;
-
-      setConducteurs(prev => prev.filter(conducteur => conducteur.id !== conducteurId));
-      toast({
-        title: "Succès",
-        description: "Conducteur supprimé avec succès",
-      });
-      return true;
-    } catch (error) {
-      console.error('Error deleting conducteur:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le conducteur",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    fetchConducteurs();
-  }, [user]);
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Conducteur supprimé avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['conducteurs'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de supprimer le conducteur: ${error.message}`, variant: "destructive" });
+    },
+  });
 
   return {
-    conducteurs,
-    loading,
+    conducteurs: conducteurs ?? [],
+    isLoading,
+    isError,
+    error,
     createConducteur,
     updateConducteur,
     deleteConducteur,
-    refetch: fetchConducteurs
   };
 }

@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle } from 'lucide-react';
 import type { Client, ClientInsert, ClientUpdate } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
+import { UseMutationResult } from '@tanstack/react-query';
 
 const formSchema = z.object({
   name: z.string().nonempty("Le nom est requis"),
@@ -20,8 +20,8 @@ const formSchema = z.object({
 });
 
 interface AddNewClientProps {
-  createClient: (data: ClientInsert) => Promise<any>;
-  updateClient: (data: ClientUpdate) => Promise<any>;
+  createClient: UseMutationResult<any, Error, ClientInsert, unknown>;
+  updateClient: UseMutationResult<any, Error, ClientUpdate, unknown>;
   clientToEdit?: Client | null;
   onFinished: () => void;
 }
@@ -29,6 +29,7 @@ interface AddNewClientProps {
 const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient, clientToEdit, onFinished }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const isEditMode = !!clientToEdit;
+  const isSubmitting = createClient.isPending || updateClient.isPending;
 
   const defaultValues = {
     name: '',
@@ -47,18 +48,15 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
     if (clientToEdit) {
       form.reset(clientToEdit);
       setIsOpen(true);
+    } else {
+      form.reset(defaultValues);
     }
   }, [clientToEdit, form]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      // Reset form when closing
-      form.reset(defaultValues);
-      // Clear edit mode if we're not editing anymore
-      if (!clientToEdit) {
-        onFinished();
-      }
+      onFinished();
     }
   };
 
@@ -68,15 +66,18 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
   };
 
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const success = isEditMode
-      ? await updateClient({ ...values, id: clientToEdit.id, user_id: user?.id })
-      : await createClient({ ...values, user_id: user?.id } as any);
-
-    if (success) {
+    try {
+      if (isEditMode) {
+        await updateClient.mutateAsync({ ...values, id: clientToEdit.id });
+      } else {
+        await createClient.mutateAsync(values as ClientInsert);
+      }
       form.reset();
       setIsOpen(false);
       onFinished();
+    } catch (error) {
+      // Errors are handled by the mutation's onError callback
+      console.error("Failed to save client:", error);
     }
   };
 
@@ -172,11 +173,11 @@ const AddNewClient: React.FC<AddNewClientProps> = ({ createClient, updateClient,
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t border-gray-400 bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)}>
+                  <Button type="button" className='bg-gray-100' onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
                     Annuler
                   </Button>
-                  <Button type="submit">
-                    {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Enregistrer')}
                   </Button>
                 </div>
               </SheetFooter>

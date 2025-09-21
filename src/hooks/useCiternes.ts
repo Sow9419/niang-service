@@ -1,141 +1,107 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import type { Citerne, CiterneInsert, CiterneUpdate } from '@/types/database';
 
+// Function to fetch citernes from Supabase
+const fetchCiternes = async (userId: string) => {
+  if (!userId) return [];
+
+  const { data, error } = await supabase
+    .from('citernes')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+// The main hook
 export function useCiternes() {
-  const [citernes, setCiternes] = useState<Citerne[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Charger toutes les citernes
-  const fetchCiternes = async () => {
-    if (!user) return;
+  // Query to fetch the list of citernes
+  const { data: citernes, isLoading, isError, error } = useQuery<Citerne[], Error>({
+    queryKey: ['citernes', user?.id],
+    queryFn: () => fetchCiternes(user!.id),
+    enabled: !!user,
+  });
 
-    try {
-      setLoading(true);
+  // Mutation for creating a new citerne
+  const createCiterne = useMutation({
+    mutationFn: async (citerneData: CiterneInsert) => {
+      if (!user) throw new Error("User not authenticated");
       const { data, error } = await supabase
         .from('citernes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setCiternes(data || []);
-    } catch (error) {
-      console.error('Error fetching citernes:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les citernes",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Créer une nouvelle citerne
-  const createCiterne = async (citerneData: CiterneInsert) => {
-    if (!user) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('citernes')
-        .insert([{ ...citerneData, user_id: user.id }])
+        .insert({ ...citerneData, user_id: user.id })
         .select()
         .single();
-
       if (error) throw error;
-
-      setCiternes(prev => [data, ...prev]);
-      toast({
-        title: "Succès",
-        description: "Citerne créée avec succès",
-      });
       return data;
-    } catch (error) {
-      console.error('Error creating citerne:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer la citerne",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Citerne créée avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['citernes'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de créer la citerne: ${error.message}`, variant: "destructive" });
+    },
+  });
 
-  // Mettre à jour une citerne
-  const updateCiterne = async (citerneData: CiterneUpdate) => {
-    try {
+  // Mutation for updating a citerne
+  const updateCiterne = useMutation({
+    mutationFn: async (citerneData: CiterneUpdate) => {
+      if (!user) throw new Error("User not authenticated");
       const { data, error } = await supabase
         .from('citernes')
         .update(citerneData)
-        .eq('id', citerneData.id)
-        .eq('user_id', user?.id)
+        .eq('id', citerneData.id!)
+        .eq('user_id', user.id)
         .select()
         .single();
-
       if (error) throw error;
-
-      setCiternes(prev => prev.map(citerne => 
-        citerne.id === citerneData.id ? data : citerne
-      ));
-      toast({
-        title: "Succès",
-        description: "Citerne mise à jour avec succès",
-      });
       return data;
-    } catch (error) {
-      console.error('Error updating citerne:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la citerne",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Citerne mise à jour avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['citernes'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de mettre à jour la citerne: ${error.message}`, variant: "destructive" });
+    },
+  });
 
-  // Supprimer une citerne
-  const deleteCiterne = async (citerneId: string) => {
-    try {
+  // Mutation for deleting a citerne
+  const deleteCiterne = useMutation({
+    mutationFn: async (citerneId: string) => {
+      if (!user) throw new Error("User not authenticated");
       const { error } = await supabase
         .from('citernes')
         .delete()
         .eq('id', citerneId)
-        .eq('user_id', user?.id);
-
+        .eq('user_id', user.id);
       if (error) throw error;
-
-      setCiternes(prev => prev.filter(citerne => citerne.id !== citerneId));
-      toast({
-        title: "Succès",
-        description: "Citerne supprimée avec succès",
-      });
-      return true;
-    } catch (error) {
-      console.error('Error deleting citerne:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la citerne",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    fetchCiternes();
-  }, [user]);
+    },
+    onSuccess: () => {
+      toast({ title: "Succès", description: "Citerne supprimée avec succès." });
+      queryClient.invalidateQueries({ queryKey: ['citernes'] });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: `Impossible de supprimer la citerne: ${error.message}`, variant: "destructive" });
+    },
+  });
 
   return {
-    citernes,
-    loading,
+    citernes: citernes ?? [],
+    isLoading,
+    isError,
+    error,
     createCiterne,
     updateCiterne,
     deleteCiterne,
-    refetch: fetchCiternes
   };
 }

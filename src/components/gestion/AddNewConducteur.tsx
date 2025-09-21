@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PlusCircle, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Conducteur, ConducteurInsert, ConducteurUpdate } from '@/types';
+import { UseMutationResult } from '@tanstack/react-query';
 
 const formSchema = z.object({
   name: z.string().nonempty("Le nom est requis"),
@@ -21,8 +22,8 @@ const formSchema = z.object({
 });
 
 interface AddNewConducteurProps {
-  createConducteur: (data: ConducteurInsert) => Promise<any>;
-  updateConducteur: (data: ConducteurUpdate) => Promise<any>;
+  createConducteur: UseMutationResult<any, Error, ConducteurInsert, unknown>;
+  updateConducteur: UseMutationResult<any, Error, ConducteurUpdate, unknown>;
   conducteurToEdit?: Conducteur | null;
   onFinished: () => void;
 }
@@ -31,6 +32,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
   const [isOpen, setIsOpen] = React.useState(false);
   const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
   const isEditMode = !!conducteurToEdit;
+  const isSubmitting = createConducteur.isPending || updateConducteur.isPending;
 
   const defaultValues = {
     name: '',
@@ -45,22 +47,24 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
 
   useEffect(() => {
     if (conducteurToEdit) {
-      form.reset(conducteurToEdit);
+      form.reset({
+        name: conducteurToEdit.name,
+        phone: conducteurToEdit.phone || '',
+        status: conducteurToEdit.status,
+      });
       setAvatarPreview(conducteurToEdit.avatar_url || null);
       setIsOpen(true);
+    } else {
+        form.reset(defaultValues);
     }
   }, [conducteurToEdit, form]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      // Reset form and avatar when closing
       form.reset(defaultValues);
       setAvatarPreview(null);
-      // Clear edit mode if we're not editing anymore
-      if (!conducteurToEdit) {
-        onFinished();
-      }
+      onFinished();
     }
   };
 
@@ -79,33 +83,39 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
   };
 
   const handleFormSubmit = async (values: z.infer<typeof formSchema>) => {
-    let avatarUrl: string | undefined = conducteurToEdit?.avatar_url;
+    try {
+        let avatar_url: string | undefined = conducteurToEdit?.avatar_url;
 
-    if (values.avatar) {
-      const file = values.avatar;
-      const filePath = `avatars/${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
+        if (values.avatar) {
+            const file = values.avatar;
+            const filePath = `avatars/${Date.now()}-${file.name}`;
+            const { data, error } = await supabase.storage.from('images').upload(filePath, file);
 
-      if (error) {
-        console.error("Error uploading avatar:", error);
-        return;
-      }
+            if (error) throw error;
 
-      const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(data.path);
-      avatarUrl = publicUrl;
-    }
+            const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(data.path);
+            avatar_url = publicUrl;
+        }
 
-    const success = isEditMode
-      ? await updateConducteur({ id: conducteurToEdit.id, name: values.name, phone: values.phone, status: values.status, avatar_url: avatarUrl })
-      : await createConducteur({ name: values.name, phone: values.phone, status: values.status, avatar_url: avatarUrl });
+        const submissionData = {
+            name: values.name,
+            phone: values.phone,
+            status: values.status,
+            avatar_url: avatar_url,
+        };
 
-    if (success) {
-      form.reset();
-      setAvatarPreview(null);
-      setIsOpen(false);
-      onFinished();
+        if (isEditMode) {
+            await updateConducteur.mutateAsync({ ...submissionData, id: conducteurToEdit.id });
+        } else {
+            await createConducteur.mutateAsync(submissionData);
+        }
+
+        form.reset(defaultValues);
+        setAvatarPreview(null);
+        setIsOpen(false);
+        onFinished();
+    } catch (error) {
+        console.error("Failed to save conducteur:", error);
     }
   };
 
@@ -132,6 +142,7 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
             <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col h-full">
               <ScrollArea className="flex-grow px-6">
                 <div className="py-4 space-y-3">
+                  {/* ... Form fields remain the same ... */}
                   <FormField
                     control={form.control}
                     name="name"
@@ -184,11 +195,11 @@ const AddNewConducteur: React.FC<AddNewConducteurProps> = ({ createConducteur, u
               </ScrollArea>
               <SheetFooter className="px-6 py-4 mt-auto border-t bg-background sticky bottom-0">
                 <div className="flex justify-end space-x-4 w-full">
-                  <Button type="button" className='text-gray-700 bg-white'  onClick={() => handleOpenChange(false)}>
+                  <Button type="button" className='text-gray-700 bg-white'  onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
                     Annuler
                   </Button>
-                  <Button type="submit">
-                    {isEditMode ? 'Enregistrer les modifications' : 'Enregistrer'}
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Enregistrer')}
                   </Button>
                 </div>
               </SheetFooter>

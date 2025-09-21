@@ -3,7 +3,7 @@ import { useState } from "react";
 import DeliveriesList from "@/components/livraison/DeliveriesList";
 import CreateDeliveryForm from "@/components/livraison/CreateDeliveryForm";
 import { useLivraisons } from "@/hooks/useLivraisons";
-import { useCommandes } from "@/hooks/useCommandes";
+import { useAllCommandes } from "@/hooks/useAllCommandes";
 import { useCiternes } from "@/hooks/useCiternes";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Livraison } from "@/types";
@@ -13,9 +13,9 @@ import { PlusCircle } from "lucide-react";
 export default function DeliveriesPage() {
   const [isFormVisible, setFormVisible] = useState(false);
   const [editingDelivery, setEditingDelivery] = useState<Livraison | null>(null);
-  const { livraisons, loading: loadingLivraisons, updateLivraison } = useLivraisons();
-  const { commandes, loading: loadingCommandes } = useCommandes();
-  const { citernes, loading: loadingCiternes } = useCiternes();
+  const { livraisons, isLoading: loadingLivraisons, updateLivraison } = useLivraisons();
+  const { data: commandes, isLoading: loadingCommandes } = useAllCommandes();
+  const { citernes, isLoading: loadingCiternes } = useCiternes();
 
 
     const handleShowCreateForm = () => {
@@ -38,11 +38,9 @@ export default function DeliveriesPage() {
     const relatedCommande = commandes.find(c => c.id === editingDelivery.commande_id);
     const commandeQuantity = relatedCommande?.quantity;
 
-    const success = await updateLivraison({ ...livraisonData, id: editingDelivery.id }, commandeQuantity);
+    await updateLivraison.mutateAsync({ ...livraisonData, id: editingDelivery.id });
 
-    if (success) {
-      handleCloseForm();
-    }
+    handleCloseForm();
   };
 
   const isLoading = loadingLivraisons || loadingCommandes || loadingCiternes;
@@ -73,7 +71,7 @@ export default function DeliveriesPage() {
         livraisons={livraisons}
         onEdit={handleEditDelivery}
         editingDeliveryId={editingDelivery?.id || null}
-        onUpdate={updateLivraison}
+        onUpdate={(data) => updateLivraison.mutateAsync(data)}
         isLoading={isLoading}
       />
     </div>
