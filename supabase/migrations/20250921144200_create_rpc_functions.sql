@@ -78,7 +78,7 @@ BEGIN
             (SELECT COUNT(*) FROM previous_period_livraisons) AS previous_deliveries
     ),
     recent_commandes AS (
-        SELECT c.id, c.status, c.quantity, c.estimated_amount, cl.name as client_name
+        SELECT c.id, c.status, c.quantity, c.estimated_amount, jsonb_build_object('name', cl.name) as clients
         FROM commandes c
         JOIN clients cl ON c.client_id = cl.id
         WHERE c.status IN ('Non Livré', 'Livré')
@@ -86,7 +86,11 @@ BEGIN
         LIMIT 3
     ),
     recent_livraisons AS (
-        SELECT l.id, l.status, l.date_livraison, l.volume_livre, c.quantity, cl.name as client_name
+        SELECT l.id, l.status, l.date_livraison, l.volume_livre,
+               jsonb_build_object(
+                   'quantity', c.quantity,
+                   'clients', jsonb_build_object('name', cl.name)
+               ) as commandes
         FROM livraisons l
         JOIN commandes c ON l.commande_id = c.id
         JOIN clients cl ON c.client_id = cl.id

@@ -317,15 +317,21 @@ export type Database = {
             status: string
             quantity: number
             estimated_amount: number
-            client_name: string
+            clients: {
+              name: string
+            }
           }[]
           livraisonsRecentes: {
             id: number
             status: string
             date_livraison: string
             volume_livre: number
-            quantity: number
-            client_name: string
+            commandes: {
+              quantity: number
+              clients: {
+                name: string
+              }
+            }
           }[]
           donutChartData: {
             name: string
