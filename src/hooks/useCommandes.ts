@@ -105,8 +105,10 @@ export function useCommandes(filters: CommandeFilters) {
     },
     onSuccess: () => {
       toast({ title: "Succès", description: "Commande créée avec succès." });
-      // When a commande is created, invalidate the 'commandes' query to refetch the list
+      // When a commande is created, invalidate queries to refetch lists
       queryClient.invalidateQueries({ queryKey: ['commandes'] });
+      queryClient.invalidateQueries({ queryKey: ['livraisons'] });
+      queryClient.invalidateQueries({ queryKey: ['allCommandes'] });
     },
     onError: (error) => {
       toast({ title: "Erreur", description: `Impossible de créer la commande: ${error.message}`, variant: "destructive" });

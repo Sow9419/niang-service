@@ -1,18 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Driver } from '../../types';
-import { Check, Truck, User, Edit, LucideTruck } from 'lucide-react';
+import { Check, Truck, Edit, LucideTruck, ChevronDown } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Badge } from '@/components/ui/badge';
 
 const DriverStatusIcon: React.FC<{ status: Driver['status'] }> = ({ status }) => {
     switch (status) {
         case 'available':
-            return <div className="w-8 h-8 flex items-center justify-center bg-green-300 rounded-full"><Check className="w-5 h-5 text-green-600" /></div>;
+            return <div className="w-8 h-8 flex items-center justify-center bg-green-100 rounded-full"><Check className="w-5 h-5 text-green-700" /></div>;
         case 'on_delivery':
-            return <div className="w-8 h-8 flex items-center justify-center bg-blue-500 rounded-full"><Truck className="w-5 h-5 text-white" /></div>;
+            return <div className="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full"><Truck className="w-5 h-5 text-blue-700" /></div>;
         default:
             return null;
     }
@@ -34,7 +36,7 @@ const DriverCard: React.FC<{ driver: Driver; onEdit: (driver: Driver) => void; }
         </div>
         <div className="flex items-center gap-2">
             <Button className='rounded-full bg-white' size="icon" onClick={() => onEdit(driver)}>
-                <Edit className="h-4 w-4 text-gray-800" />
+                <Edit className="h-4 w-4 text-gray-700" />
             </Button>
             <DriverStatusIcon status={driver.status} />
         </div>
@@ -43,6 +45,8 @@ const DriverCard: React.FC<{ driver: Driver; onEdit: (driver: Driver) => void; }
 
 
 const DriverList: React.FC<{ drivers: Driver[], isLoading: boolean, onEdit: (driver: Driver) => void; }> = ({ drivers, isLoading, onEdit }) => {
+    const [isOpen, setIsOpen] = useState(true);
+
     if (isLoading) {
         return (
             <Card className="bg-white shadow-sm w-auto">
@@ -66,23 +70,33 @@ const DriverList: React.FC<{ drivers: Driver[], isLoading: boolean, onEdit: (dri
 
     return (
         <Card className="bg-white shadow-sm w-auto border-none">
-            <CardHeader>
-                <CardTitle className='text-black'>Équipe de Conducteurs</CardTitle>
-            </CardHeader>
-            <ScrollArea className="h-[320px] w-auto">
-                <CardContent className="space-y-2">
-                    {drivers.length > 0 ? (
-                        drivers.map(driver => (
-                            <DriverCard key={driver.id} driver={driver} onEdit={onEdit} />
-                        ))
-                    ) : (
-                        <div className="text-center py-12">
-                            <h3 className="text-lg font-semibold text-black">Aucun conducteur trouvé</h3>
-                            <p className="text-gray-800 mt-1 text-sm">Commencez par ajouter un nouveau conducteur.</p>
+            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+                <CollapsibleTrigger className="w-full">
+                    <CardHeader className="flex flex-row items-center justify-between w-full">
+                        <div className="flex items-center gap-2">
+                            <CardTitle className='text-black'>Équipe de Conducteurs</CardTitle>
+                            <Badge variant="secondary">{drivers.length}</Badge>
                         </div>
-                    )}
-                </CardContent>
-            </ScrollArea>
+                        <ChevronDown className={`h-8 w-8 transition-transform duration-300 text-black bg-black/10 rounded-full p-2 ${isOpen ? 'rotate-180' : ''}`} />
+                    </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <ScrollArea className="h-[320px] w-auto">
+                        <CardContent className="space-y-2">
+                            {drivers.length > 0 ? (
+                                drivers.map(driver => (
+                                    <DriverCard key={driver.id} driver={driver} onEdit={onEdit} />
+                                ))
+                            ) : (
+                                <div className="text-center py-12">
+                                    <h3 className="text-lg font-semibold text-black">Aucun conducteur trouvé</h3>
+                                    <p className="text-gray-700 mt-1 text-sm">Commencez par ajouter un nouveau conducteur.</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </ScrollArea>
+                </CollapsibleContent>
+            </Collapsible>
         </Card>
     );
 };
