@@ -314,7 +314,7 @@ export type Database = {
           }
           commandesEnCours: {
             id: number
-            status: string
+            status: "Non Livré" | "Livré" | "Annulée"
             quantity: number
             estimated_amount: number
             clients: {
@@ -323,7 +323,7 @@ export type Database = {
           }[]
           livraisonsRecentes: {
             id: number
-            status: string
+            status: "Non Livré" | "Livré" | "Annulée"
             date_livraison: string
             volume_livre: number
             commandes: {

@@ -106,47 +106,43 @@ BEGIN
     bar_chart_data AS (
         SELECT
             jsonb_agg(
-                jsonb_build_object('name', name, 'value', value)
+                jsonb_build_object('name', name, 'value', value) ORDER BY d
             ) as data
         FROM (
             SELECT
+                d.day::date,
                 CASE
-                    WHEN p_period = 'Jour' THEN to_char(d, 'Dy')
-                    WHEN p_period = 'Semaine' THEN 'S' || to_char(d, 'W')
-                    ELSE to_char(d, 'Mon')
+                    WHEN p_period = 'Jour' THEN to_char(d.day, 'Dy')
+                    WHEN p_period = 'Semaine' THEN 'S' || to_char(d.day, 'W')
+                    ELSE to_char(d.day, 'Mon')
                 END as name,
                 COALESCE(SUM(l.montant_total), 0) as value
             FROM
                 generate_series(
-                    CASE
+                    (CASE
                         WHEN p_period = 'Jour' THEN CURRENT_DATE - INTERVAL '6 days'
                         WHEN p_period = 'Semaine' THEN date_trunc('week', CURRENT_DATE) - INTERVAL '3 weeks'
                         ELSE date_trunc('month', CURRENT_DATE) - INTERVAL '11 months'
-                    END,
-                    CURRENT_DATE,
-                    CASE
-                        WHEN p_period = 'Jour' THEN '1 day'
-                        WHEN p_period = 'Semaine' THEN '1 week'
-                        ELSE '1 month'
-                    END
-                ) as d
-            LEFT JOIN livraisons l ON l.date_livraison = d AND l.status = 'Livré'
-            GROUP BY d
-            ORDER BY d
+                    END)::date,
+                    CURRENT_DATE::date,
+                    '1 day'::interval
+                ) as d(day)
+            LEFT JOIN livraisons l ON l.date_livraison::date = d.day::date AND l.status = 'Livré'
+            GROUP BY d.day
         ) as chart_series
     )
     SELECT jsonb_build_object(
-        'kpiData', (SELECT to_jsonb(kpi_stats.*) FROM kpi_stats),
-        'commandesEnCours', (SELECT jsonb_agg(to_jsonb(recent_commandes.*)) FROM recent_commandes),
-        'livraisonsRecentes', (SELECT jsonb_agg(to_jsonb(recent_livraisons.*)) FROM recent_livraisons),
-        'donutChartData', (
+        'kpiData', COALESCE((SELECT to_jsonb(kpi_stats.*) FROM kpi_stats), '{}'::jsonb),
+        'commandesEnCours', COALESCE((SELECT jsonb_agg(to_jsonb(recent_commandes.*)) FROM recent_commandes), '[]'::jsonb),
+        'livraisonsRecentes', COALESCE((SELECT jsonb_agg(to_jsonb(recent_livraisons.*)) FROM recent_livraisons), '[]'::jsonb),
+        'donutChartData', COALESCE((
             SELECT jsonb_build_array(
                 jsonb_build_object('name', 'Volume livré', 'value', volume_livre),
                 jsonb_build_object('name', 'Volume manquant', 'value', volume_manquant)
             )
             FROM donut_chart
-        ),
-        'barChartData', (SELECT data FROM bar_chart_data)
+        ), '[]'::jsonb),
+        'barChartData', COALESCE((SELECT data FROM bar_chart_data), '[]'::jsonb)
     ) INTO result;
 
     RETURN result;
