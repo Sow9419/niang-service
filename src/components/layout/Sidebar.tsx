@@ -10,7 +10,7 @@ interface SidebarProps {
 const navItems: { icon: React.ElementType; label: string; path: string }[] = [
   { icon: LayoutGrid, label: 'Dashboard', path: '/dashboard' },
   { icon: Package, label: 'Commandes', path: '/orders' },
-  { icon: Truck, label: 'Deliveries', path: '/deliveries' },
+  { icon: Truck, label: 'Livraisons', path: '/deliveries' },
   { icon: ClipboardList, label: 'Gestion', path: '/gestion' },
 ];
 
@@ -45,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ deliveryCount = 0 }) => {
             >
               <IconComponent className="w-6 h-6" />
                {item.path === '/deliveries' && deliveryCount > 0 && (
-                <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-100 text-xs font-bold text-orange-500">
                   {deliveryCount}
                 </span>
               )}
