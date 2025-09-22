@@ -71,7 +71,7 @@ export default function SignUp() {
         variant: "destructive",
       });
     } else {
-      navigate("/home");
+      navigate("/");
     }
 
     setLoading(false);
