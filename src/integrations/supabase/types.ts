@@ -272,7 +272,78 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_analytics_stats: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          totalCommandes: number
+          commandesEnCours: number
+          commandesLivrees: number
+          commandesAnnulees: number
+          totalLivraisons: number
+          livraisonsEnCours: number
+          livraisonsLivrees: number
+          montantTotal: number
+          montantPaye: number
+          montantEnAttente: number
+          volumeTotalLivre: number
+          volumeTotalManquant: number
+          conducteursDisponibles: number
+          citernes: {
+            total: number
+            disponibles: number
+            enLivraison: number
+            enMaintenance: number
+          }
+        }
+      }
+      get_dashboard_analytics: {
+        Args: {
+          p_period: string
+          p_user_id: string
+        }
+        Returns: {
+          kpiData: {
+            current_revenue: number
+            previous_revenue: number
+            current_volume: number
+            previous_volume: number
+            orders_in_progress: number
+            current_deliveries: number
+            previous_deliveries: number
+          }
+          commandesEnCours: {
+            id: number
+            status: "Non Livré" | "Livré" | "Annulée"
+            quantity: number
+            estimated_amount: number
+            clients: {
+              name: string
+            }
+          }[]
+          livraisonsRecentes: {
+            id: number
+            status: "Non Livré" | "Livré" | "Annulée"
+            date_livraison: string
+            volume_livre: number
+            commandes: {
+              quantity: number
+              clients: {
+                name: string
+              }
+            }
+          }[]
+          donutChartData: {
+            name: string
+            value: number
+          }[]
+          barChartData: {
+            name: string
+            value: number
+          }[]
+        }
+      }
     }
     Enums: {
       statut_citerne: "Disponible" | "En livraison" | "En maintenance"
