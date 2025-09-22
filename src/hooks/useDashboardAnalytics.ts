@@ -40,7 +40,10 @@ const getDates = (period: Period) => {
     };
 }
 
+import { useAuth } from './useAuth';
+
 export function useDashboardAnalytics(period: Period = 'Mois') {
+    const { user } = useAuth();
     const [kpiData, setKpiData] = useState({
         revenue: 0, volume: 0, orders: 0, deliveries: 0,
         revenueChange: 0, volumeChange: 0, ordersChange: 0, deliveriesChange: 0,
@@ -52,10 +55,15 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        if (!user) return;
+
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const { data, error } = await supabase.rpc('get_dashboard_analytics', { p_period: period });
+                const { data, error } = await supabase.rpc('get_dashboard_analytics', {
+                    p_period: period,
+                    p_user_id: user.id
+                });
 
                 if (error) {
                     throw error;
@@ -91,3 +99,4 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
 
     return { kpiData, commandesEnCours, livraisonsRecentes, donutChartData, barChartData, isLoading };
 }
+
