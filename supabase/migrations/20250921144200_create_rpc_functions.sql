@@ -31,7 +31,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION get_dashboard_analytics(p_period TEXT)
+CREATE OR REPLACE FUNCTION get_dashboard_analytics(p_period TEXT, p_user_id UUID)
 RETURNS JSONB
 LANGUAGE plpgsql
 AS $$
@@ -65,7 +65,7 @@ BEGIN
         FROM (
             SELECT jsonb_build_object('name', to_char(d.day, 'Dy'), 'value', COALESCE(SUM(l.montant_total), 0)) as day_data
             FROM generate_series(CURRENT_DATE - INTERVAL '6 days', CURRENT_DATE, '1 day'::interval) as d(day)
-            LEFT JOIN livraisons l ON l.date_livraison::date = d.day::date AND l.status = 'Livré'
+            LEFT JOIN livraisons l ON l.date_livraison::date = d.day::date AND l.status = 'Livré' AND l.user_id = p_user_id
             GROUP BY d.day
             ORDER BY d.day
         ) q;
@@ -75,7 +75,7 @@ BEGIN
         FROM (
             SELECT jsonb_build_object('name', 'S' || to_char(d.week, 'W'), 'value', COALESCE(SUM(l.montant_total), 0)) as week_data
             FROM generate_series(date_trunc('week', CURRENT_DATE) - INTERVAL '3 weeks', date_trunc('week', CURRENT_DATE), '1 week'::interval) as d(week)
-            LEFT JOIN livraisons l ON date_trunc('week', l.date_livraison::date) = d.week AND l.status = 'Livré'
+            LEFT JOIN livraisons l ON date_trunc('week', l.date_livraison::date) = d.week AND l.status = 'Livré' AND l.user_id = p_user_id
             GROUP BY d.week
             ORDER BY d.week
         ) q;
@@ -85,7 +85,7 @@ BEGIN
         FROM (
             SELECT jsonb_build_object('name', to_char(d.month, 'Mon'), 'value', COALESCE(SUM(l.montant_total), 0)) as month_data
             FROM generate_series(date_trunc('month', CURRENT_DATE) - INTERVAL '11 months', date_trunc('month', CURRENT_DATE), '1 month'::interval) as d(month)
-            LEFT JOIN livraisons l ON date_trunc('month', l.date_livraison::date) = d.month AND l.status = 'Livré'
+            LEFT JOIN livraisons l ON date_trunc('month', l.date_livraison::date) = d.month AND l.status = 'Livré' AND l.user_id = p_user_id
             GROUP BY d.month
             ORDER BY d.month
         ) q;
@@ -94,19 +94,19 @@ BEGIN
     -- Consolidate all data into a single JSON object
     WITH kpi_data AS (
         SELECT
-            (SELECT COALESCE(SUM(montant_total), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date) AS current_revenue,
-            (SELECT COALESCE(SUM(montant_total), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_prev_start_date AND date_livraison < v_prev_end_date) AS previous_revenue,
-            (SELECT COALESCE(SUM(volume_livre), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date) AS current_volume,
-            (SELECT COALESCE(SUM(volume_livre), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_prev_start_date AND date_livraison < v_prev_end_date) AS previous_volume,
-            (SELECT COUNT(*) FROM commandes WHERE status = 'Non Livré') AS orders_in_progress,
-            (SELECT COUNT(*) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date) AS current_deliveries,
-            (SELECT COUNT(*) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_prev_start_date AND date_livraison < v_prev_end_date) AS previous_deliveries
+            (SELECT COALESCE(SUM(montant_total), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date AND user_id = p_user_id) AS current_revenue,
+            (SELECT COALESCE(SUM(montant_total), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_prev_start_date AND date_livraison < v_prev_end_date AND user_id = p_user_id) AS previous_revenue,
+            (SELECT COALESCE(SUM(volume_livre), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date AND user_id = p_user_id) AS current_volume,
+            (SELECT COALESCE(SUM(volume_livre), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_prev_start_date AND date_livraison < v_prev_end_date AND user_id = p_user_id) AS previous_volume,
+            (SELECT COUNT(*) FROM commandes WHERE status = 'Non Livré' AND user_id = p_user_id) AS orders_in_progress,
+            (SELECT COUNT(*) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date AND user_id = p_user_id) AS current_deliveries,
+            (SELECT COUNT(*) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_prev_start_date AND date_livraison < v_prev_end_date AND user_id = p_user_id) AS previous_deliveries
     ),
     recent_commandes AS (
         SELECT c.id, c.status, c.quantity, c.estimated_amount, jsonb_build_object('name', cl.name) as clients
         FROM commandes c
         JOIN clients cl ON c.client_id = cl.id
-        WHERE c.status IN ('Non Livré', 'Livré')
+        WHERE c.status IN ('Non Livré', 'Livré') AND c.user_id = p_user_id
         ORDER BY c.created_at DESC
         LIMIT 3
     ),
@@ -116,14 +116,14 @@ BEGIN
         FROM livraisons l
         JOIN commandes c ON l.commande_id = c.id
         JOIN clients cl ON c.client_id = cl.id
-        WHERE l.status = 'Livré'
+        WHERE l.status = 'Livré' AND l.user_id = p_user_id
         ORDER BY l.date_livraison DESC
         LIMIT 3
     ),
     donut_data AS (
         SELECT
-            (SELECT COALESCE(SUM(volume_livre), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date) AS volume_livre,
-            (SELECT COALESCE(SUM(volume_manquant), 0) FROM livraisons WHERE date_livraison >= v_start_date) AS volume_manquant
+            (SELECT COALESCE(SUM(volume_livre), 0) FROM livraisons WHERE status = 'Livré' AND date_livraison >= v_start_date AND user_id = p_user_id) AS volume_livre,
+            (SELECT COALESCE(SUM(volume_manquant), 0) FROM livraisons WHERE date_livraison >= v_start_date AND user_id = p_user_id) AS volume_manquant
     )
     SELECT jsonb_build_object(
         'kpiData', (SELECT to_jsonb(kpi_data.*) FROM kpi_data),

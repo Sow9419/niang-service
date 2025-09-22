@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Building2, Phone, Mail, Settings, Loader2, MessageCircleMore } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Interface for user profile data
 interface Profile {
@@ -25,6 +26,7 @@ export function SettingsDialog() {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch user profile when the dialog is opened and user exists
@@ -49,8 +51,10 @@ export function SettingsDialog() {
 
   // Handle user sign-out
   const handleSignOut = async () => {
+    console.log("LOG: Clic sur Déconnexion détecté dans Setting.tsx");
     await signOut();
-    window.location.href = "/";
+    console.log("LOG: Appel de signOut() terminé. Redirection en cours...");
+    navigate("/");
   };
 
   return (

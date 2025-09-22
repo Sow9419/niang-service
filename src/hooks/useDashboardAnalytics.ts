@@ -95,7 +95,7 @@ export function useDashboardAnalytics(period: Period = 'Mois') {
         };
 
         fetchData();
-    }, [period]);
+    }, [period, user]);
 
     return { kpiData, commandesEnCours, livraisonsRecentes, donutChartData, barChartData, isLoading };
 }
